@@ -124,8 +124,7 @@ const url = `${stateVariables.url}/${stateVariables.todos}`;
 
 
 document.getElementById("logout")!.addEventListener("click", () => {
-  sessionStorage.removeItem('creds');
-  sessionStorage.setItem('authenticated', 'false');
+  credentials = "";
   document.getElementById("login-container")!.style.display = "block";
   document.getElementById("main-container")!.style.display = "none";
 
