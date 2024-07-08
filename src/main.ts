@@ -1,6 +1,6 @@
 import { stateVariables } from './stateVariable';
 import './style.css';
-import './login';
+
 interface Todo {
   id?: string;
   title: string;
@@ -11,21 +11,116 @@ interface Todo {
   category: string;
 }
 
-const authenticated = sessionStorage.getItem('authenticated');
 
 
-if (authenticated !== 'true') {
-  document.getElementById("login-container")!.style.display = "block";
-  document.getElementById("main-container")!.style.display = "none";
-}
 
-const creds = JSON.parse(sessionStorage.getItem('creds')!);
-const credentials = btoa(`${creds.email}:${creds.password}`);
+var credentials = "";
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("loginForm") as HTMLFormElement;
+  const loginMessage = document.getElementById(
+    "loginMessage"
+  ) as HTMLParagraphElement;
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      .value;
+
+    try {
+      const response = await fetch(`${stateVariables.url}/${stateVariables.login}`, {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!response.ok) {
+        loginMessage.innerText = "Network response was not ok";
+        throw new Error("Network response was not ok");
+      }
+
+      const responseData = await response.json();
+      console.log(responseData); // Handle success response
+      loginMessage.innerText = responseData;
+      document.getElementById("login-container")!.style.display = "none";
+      document.getElementById("main-container")!.style.display = "flex";
+      credentials = btoa(`${email}:${password}`)
+      fetchAndDisplayTodos();
+
+        
+    } catch (error) {
+      console.error("Error Logging In:", error); // Handle error
+      loginMessage.innerText = "Invalid Credentials";
+    }
+  });
+
+  document.getElementById('registerButton')!.addEventListener('click', async function() {
+
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      .value;
+
+    try {
+      const response = await fetch(`${stateVariables.url}/${stateVariables.register}`, {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!response.ok) {
+        loginMessage.innerText = "Network response was not ok";
+        throw new Error("Network response was not ok");
+      }
+
+      const responseData = await response.json();
+      console.log(responseData); // Handle success response
+      loginMessage.innerText = responseData;
+      document.getElementById("login-container")!.style.display = "none";
+      document.getElementById("main-container")!.style.display = "flex";
+      credentials = btoa(`${email}:${password}`)
+      fetchAndDisplayTodos();
+    } catch (error) {
+      console.error("Error Registering:", error); // Handle error
+      loginMessage.innerText = "User Already Exists";
+    }
+});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 var todosData: Todo[] = [];
 var editingTodo: string | null = null;
 const url = `${stateVariables.url}/${stateVariables.todos}`;
+
 
 
 document.getElementById("logout")!.addEventListener("click", () => {
@@ -214,7 +309,9 @@ function clearForm(): void {
   (document.getElementById('category') as HTMLInputElement).value = '';
 }
 
+if(credentials){
 fetchAndDisplayTodos();
+}
 
 const addTodoBtn = document.getElementById("add-todo") as HTMLElement;
 addTodoBtn.addEventListener("click", () => {
@@ -222,4 +319,5 @@ addTodoBtn.addEventListener("click", () => {
 
 
 });
+
 
