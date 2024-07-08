@@ -3,12 +3,12 @@ import { createTodos, deleteTodos, getTodos, updateTodos } from "../controller/t
 
 const todosRouter = express();
 
-todosRouter.get("/", getTodos);
+todosRouter.post("/", getTodos);
 
-todosRouter.post("/", createTodos);
+todosRouter.post("/create", createTodos);
 
-todosRouter.put("/:id", updateTodos);
+todosRouter.put("/update/:id", updateTodos);
  
-todosRouter.delete("/:id", deleteTodos);
+todosRouter.delete("/delete/:id", deleteTodos);
 
 export default todosRouter;
