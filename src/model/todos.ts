@@ -77,10 +77,7 @@ export function updateTodosById(id: string, todos: Itodos){
     try{
         const todosToBeUpdated = todosData.find(({id: todosId}) => todosId === id);
         if(todosToBeUpdated){
-        todosData[parseInt(id) - 1] = {
-            id: id,
-            ...todos
-        };
+            Object.assign(todosToBeUpdated, {id: id, ...todos});
 
         return {responseCode: 201, responseMessage: "Todo Updated Successfully"};
     }else{
@@ -96,6 +93,7 @@ export function deleteTodosById(id: string){
         const todosToBeDeleted = todosData.find(({id: todosId}) => todosId === id);
         if(todosToBeDeleted){
         todosData = todosData.filter(({id: todosId}) => todosId != id );
+        console.log(todosData)
         return {responseCode: 201, responseMessage: "Todo Deleted Successfully"};
         }else{
             return {responseCode: 400, responseMessage: "Todo Does Not Exist"};
