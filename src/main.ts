@@ -1,3 +1,4 @@
+import { stateVariables } from './stateVariable';
 import './style.css';
 interface Todo {
   id?: string;
@@ -9,16 +10,38 @@ interface Todo {
   category: string;
 }
 
+const authenticated = sessionStorage.getItem('authenticated');
+
+
+if (authenticated !== 'true') {
+  window.location.href = './login.html';
+}
+
+const creds = JSON.parse(sessionStorage.getItem('creds')!);
+const credentials = btoa(`${creds.email}:${creds.password}`);
+
+
 var todosData: Todo[] = [];
 var editingTodo: string | null = null;
-const url = "http://localhost:8000/todos";
+const url = `${stateVariables.url}/${stateVariables.todos}`;
 
 
+document.getElementById("logout")!.addEventListener("click", () => {
+  sessionStorage.removeItem('creds');
+  sessionStorage.setItem('authenticated', 'false');
+  window.location.href = './login.html';
 
+
+});
 
 async function fetchAndDisplayTodos() {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: 'POST',   
+      headers: {
+        'Authorization': `Basic ${credentials}`
+    },
+  });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
@@ -83,11 +106,13 @@ async function addOrEditTodo() {
       if(editingTodo){
 
         try {
-          const response = await fetch(`${url}/${editingTodo}`, {
+          const response = await fetch(`${url}/${stateVariables.update}/${editingTodo}`, {
               method: 'PUT',
               body: JSON.stringify(newTodo),
               headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+        'Authorization': `Basic ${credentials}`
+
               }
           });
       
@@ -110,11 +135,13 @@ async function addOrEditTodo() {
       }
       else{
         try {
-          const response = await fetch(url, {
+          const response = await fetch(`${url}/${stateVariables.create}`, {
               method: 'POST',
               body: JSON.stringify(newTodo),
               headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+        'Authorization': `Basic ${credentials}`
+
               }
           });
   
@@ -142,8 +169,11 @@ async function addOrEditTodo() {
 
 async function deleteTodo(id: string) {
   try {
-    const response = await fetch(`${url}/${id}`, {
+    const response = await fetch(`${url}/${stateVariables.del}/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Basic ${credentials}`
+      },
     });
 
     if (!response.ok) {
