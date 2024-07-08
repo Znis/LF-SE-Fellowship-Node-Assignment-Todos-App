@@ -1,5 +1,5 @@
 import { stateVariables } from "./stateVariable";
-import "./style.css";
+
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm") as HTMLFormElement;
   const loginMessage = document.getElementById(
@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(responseData); // Handle success response
       loginMessage.innerText = responseData;
       sessionStorage.setItem("authenticated", "true");
+      document.getElementById("login-container")!.style.display = "none";
+      document.getElementById("main-container")!.style.display = "flex";
       sessionStorage.setItem(
         "creds",
         JSON.stringify({
@@ -41,10 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
           password: password,
         })
       );
-      window.location.href = "./index.html";
     } catch (error) {
       console.error("Error Logging In:", error); // Handle error
-      loginMessage.innerText = "Error Logging In";
+      loginMessage.innerText = "Invalid Credentials";
     }
   });
 
@@ -82,10 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
           password: password,
         })
       );
-      window.location.href = "./index.html";
+      window.location.href = "../index.html";
     } catch (error) {
       console.error("Error Registering:", error); // Handle error
-      loginMessage.innerText = "Error Registering";
+      loginMessage.innerText = "User Already Exists";
     }
 });
 });

@@ -1,5 +1,6 @@
 import { stateVariables } from './stateVariable';
 import './style.css';
+import './login';
 interface Todo {
   id?: string;
   title: string;
@@ -14,7 +15,8 @@ const authenticated = sessionStorage.getItem('authenticated');
 
 
 if (authenticated !== 'true') {
-  window.location.href = './login.html';
+  document.getElementById("login-container")!.style.display = "block";
+  document.getElementById("main-container")!.style.display = "none";
 }
 
 const creds = JSON.parse(sessionStorage.getItem('creds')!);
@@ -29,8 +31,8 @@ const url = `${stateVariables.url}/${stateVariables.todos}`;
 document.getElementById("logout")!.addEventListener("click", () => {
   sessionStorage.removeItem('creds');
   sessionStorage.setItem('authenticated', 'false');
-  window.location.href = './login.html';
-
+  document.getElementById("login-container")!.style.display = "block";
+  document.getElementById("main-container")!.style.display = "none";
 
 });
 

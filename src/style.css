@@ -8,6 +8,12 @@ body {
   background-color: #f0f0f0;
 }
 
+#main-container{
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
 .container {
   max-width: 1000px;
   margin: 50px auto;

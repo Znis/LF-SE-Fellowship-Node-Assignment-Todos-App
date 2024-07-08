@@ -1,5 +1,5 @@
 export const stateVariables = {
-    url: "",
+    url: "https://lf-se-fellowship-node-assignment-todos.onrender.com",
     todos: "todos",
     create: "create",
     update: "update",
