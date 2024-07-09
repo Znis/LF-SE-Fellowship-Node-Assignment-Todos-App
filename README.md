@@ -3,9 +3,13 @@
 Todo App is an application that lets you add your todos and keep track of them.  
 The repository contains following branches:  
 - main  
-It contains the API or node server that handles the CRUD operation of the Todo app.  
+It contains the API or node server that handles the CRUD operation of the Todo app, fulfilling basic requirements of the assignment.    
+GET /todos/ -> fetch all the todos.  
+POST /todos/ -> Create the new todo.  
+PUT /todos/:id -> Update the existing todo.  
+DELETE /todos/:id -> Delete the exisiting todo.  
 It has no active database. Instead, it uses a local variable containing few todos item.  
-The image is available at the Dockerhub. It can be build with the following tag 'znis/todoapp:latest'.  
+The image is available at the Dockerhub. It can be build with the following tag 'znis/todoapp:latest'.    
 
 - backend  
 It contains the API or node server that handles the CRUD operation of the Todo app as well as user authentication too.  
