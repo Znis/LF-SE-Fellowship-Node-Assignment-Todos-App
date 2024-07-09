@@ -6,27 +6,29 @@ export function getTodos(req: Request, res: Response){
     const data = TodosService.getTodos();
     return res.json(data);
 }
+
 export function createTodos(req: Request, res: Response){
     const data = req.body;
-    const {error, value} = todosSchema.validate(data);
+    const {error, value} = todosSchema.validate(data); //check if the incoming data satisfies the required format
     if (error) {
         return res.status(400).json({ error: error.details[0].message});
     }
     const {responseMessage, responseCode} = TodosService.createTodos(value);
     return res.status(responseCode).json(responseMessage);
 }
+
 export function updateTodos(req: Request, res: Response){
     const {id} = req.params;
     const data = req.body;
-    const {error, value} = todosSchema.validate(data);
+    const {error, value} = todosSchema.validate(data); //check if the incoming data satisfies the required format
     if (error) {
         return res.status(400).json({ error: error.details[0].message});
     }
     const {responseMessage, responseCode} = TodosService.updateTodos(id, value);
     return res.status(201).json(responseMessage);
     
-
 }
+
 export function deleteTodos(req: Request, res: Response){
    const {id} = req.params; 
    const {responseMessage, responseCode} = TodosService.deleteTodos(id);

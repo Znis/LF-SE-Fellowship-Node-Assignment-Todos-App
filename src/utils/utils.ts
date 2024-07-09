@@ -1,4 +1,4 @@
-export function objectEqual(obj1: any, obj2: any) {
+export function isObjectEqual(obj1: any, obj2: any) {
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
 

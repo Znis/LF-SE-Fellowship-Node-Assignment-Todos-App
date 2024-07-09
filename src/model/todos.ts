@@ -1,5 +1,5 @@
 import Itodos from "../interfaces/todos";
-import { objectEqual } from "../utils/utils";
+import { isObjectEqual } from "../utils/utils";
 
 let todosData = [
     {
@@ -59,7 +59,7 @@ export function createTodos(todos: Itodos){
     try{
         for(let i=0; i<todosData.length; i++){
             const  {id, ...todoData} = todosData[i];
-            if(objectEqual(todoData, todos) ) return {responseCode: 400, responseMessage: "Todo Already Exists"};
+            if(isObjectEqual(todoData, todos) ) return {responseCode: 400, responseMessage: "Todo Already Exists"};
         }
         todosData.push({
             id: `${todosData.length + 1}`,
@@ -93,7 +93,6 @@ export function deleteTodosById(id: string){
         const todosToBeDeleted = todosData.find(({id: todosId}) => todosId === id);
         if(todosToBeDeleted){
         todosData = todosData.filter(({id: todosId}) => todosId != id );
-        console.log(todosData)
         return {responseCode: 201, responseMessage: "Todo Deleted Successfully"};
         }else{
             return {responseCode: 400, responseMessage: "Todo Does Not Exist"};
