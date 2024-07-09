@@ -1,9 +1,11 @@
 export const stateVariables = {
-    url: "https://lf-se-fellowship-node-assignment-todos.onrender.com",
+    url: "http://localhost:8000",
     todos: "todos",
     create: "create",
     update: "update",
     del: "delete",
-    login: "login",
-    register: "register"
+    login: "auth/login",
+    register: "users/register",
+    auth: "auth",
+    refresh: "refresh",
 }

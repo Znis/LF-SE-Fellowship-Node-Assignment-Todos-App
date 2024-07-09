@@ -96,3 +96,7 @@ button:hover {
   color: #444;
   padding: 2rem;
  }
+
+ #name-input-div{
+  display: none;
+ }

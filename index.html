@@ -33,23 +33,41 @@
       </div>
     </div>
     <div class="login-container" id="login-container">
-      <h2>Login</h2>
+      <h2 id="form-title">Login</h2>
       <form id="loginForm">
+        <div id="name-input-div">
+          <label for="name">name:</label>
+          <input type="text" id="name" name="name" placeholder="dummy" />
+        </div>
         <div>
           <label for="email">email:</label>
-          <input type="text" id="email" name="email" placeholder="dummy@dummy.com" required />
+          <input
+            type="text"
+            id="email"
+            name="email"
+            placeholder="dummy@dummy.com"
+            required
+          />
         </div>
         <div>
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password" placeholder="dummy1234" required />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="dummy1234"
+            required
+          />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" id="submitButton">Login</button>
       </form>
-      <button id="registerButton">Register</button>
+      <button id="switchButton">Register</button>
 
       <p id="loginMessage"></p>
-    <p id="note"> The Backend server is hosted in Render. So, it may take around a minute to boot up and start responding.</p>
-
+      <p id="note">
+        The Backend server is hosted in Render. So, it may take around a minute
+        to boot up and start responding.
+      </p>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
