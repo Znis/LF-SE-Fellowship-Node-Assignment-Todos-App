@@ -91,3 +91,8 @@ button:hover {
   margin-top: 10px;
   font-size: 14px;
 }
+ #note {
+  font-size: 0.8rem;
+  color: #444;
+  padding: 2rem;
+ }
