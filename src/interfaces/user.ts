@@ -1,6 +1,7 @@
-interface Iuser{
-    email: string;
-    password: string;
+interface Iuser {
+  name: string;
+  email: string;
+  password: string;
 }
 
 export default Iuser;
