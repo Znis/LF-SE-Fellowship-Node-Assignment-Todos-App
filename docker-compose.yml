@@ -40,7 +40,7 @@ services:
       - PORT=${PORT}
       - DB_CLIENT=${DB_CLIENT}
     ports:
-      - "80:${PORT}"
+      - "${PORT}:${PORT}"
     command: bash -c "npm run migrate && npm start"
 
     restart: always

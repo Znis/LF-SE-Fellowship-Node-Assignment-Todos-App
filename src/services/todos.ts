@@ -1,5 +1,4 @@
 import Itodos from "../interfaces/todos";
-import Iuser from "../interfaces/user";
 import * as TodosModel from "../model/todos";
 
 export async function getTodos(userId: string) {
