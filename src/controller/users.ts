@@ -5,17 +5,11 @@ import userSchema from "../schema/user";
 export async function getUserByEmail(req: Request, res: Response) {
   const body = req.body;
   const data = await UsersService.getUserByEmail(body.email);
+
   if (data!.length > 0) {
-    const modelResponse = {
-      responseCode: 200,
-    };
-    return modelResponse;
+    return res.status(200).json({data});
   } else {
-    const modelResponse = {
-      responseCode: 401,
-      responseMessage: "Invalid User",
-    };
-    return modelResponse;
+    return res.status(401).json({error: "Invalid User"});
   }
 }
 
