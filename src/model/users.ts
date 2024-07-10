@@ -1,3 +1,4 @@
+import { permissions } from './../enums/users';
 import { baseKnexConfig } from "../knexFile";
 import knex from "knex";
 import Iuser from "../interfaces/user";
@@ -59,7 +60,50 @@ console.log(error);
 return 400;
 }
 }
+export async function editUserById(
+  id: string,
+  user: Iuser
+) {
+  try {
+    const resultData = await knexInstance("users")
+      .where("id", id)
+      .update({
+        name: user.name,
+        email: user.email,
+        password: user.password
 
+      })
+      .then(function (data) {
+        if (data === 1) {
+          return 200;
+        } else {
+          return 400;
+        }
+      });
+    return resultData;
+  } catch (error) {
+    console.log(error);
+    return 400;
+  }
+}
+export async function deleteUserById(id: string) {
+  try {
+    const resultData = await knexInstance("users")
+      .where("id", id)
+      .del()
+      .then(function (data) {
+        if (data === 0) {
+          return 400;
+        } else {
+          return 200;
+        }
+      });
+    return resultData;
+  } catch (error) {
+    console.log(error);
+    return 400;
+  }
+}
 export async function getRoleId(userId: string){
   try {
     const resultData = await knexInstance
@@ -70,7 +114,7 @@ export async function getRoleId(userId: string){
         return data;
       });
     if (resultData.length > 0) {
-      return resultData;
+      return [resultData[0].role_id];   
     } else {
       return [];
     }
@@ -79,17 +123,18 @@ export async function getRoleId(userId: string){
   }
 }
 
-export async function getAssignedPermissionsForRole(role: string){
+export async function getAssignedPermissionsForRole(roleId: string){
   try {
     const resultData = await knexInstance
       .select("permissions")
       .from("roles_permissions")
-      .where("role", role)
+      .where("id", roleId)
       .then(function (data) {
         return data;
       });
     if (resultData.length > 0) {
-      return resultData[0];
+      return [resultData[0].permissions];
+      
     } else {
       return [];
     }

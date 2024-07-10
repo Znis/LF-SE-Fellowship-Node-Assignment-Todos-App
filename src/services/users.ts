@@ -31,6 +31,28 @@ export async function createUser(user: Iuser) {
   return modelResponse;
 }
 
+export async function editUser(id: string, user: Iuser) {
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  user.password = hashedPassword;
+  const modelResponseCode = await UserModel.editUserById(id, user);
+  const modelResponse = {
+    status: modelResponseCode,
+    error: modelResponseCode == 200 ? "" : "Update Failed",
+    data: "",
+  };
+  return modelResponse;
+}
+
+export async function deleteUser(id: string) {
+  const modelResponseCode = await UserModel.deleteUserById(id);
+  const modelResponse = {
+    status: modelResponseCode,
+    error: modelResponseCode == 200 ? "" : "Deletion Failed",
+    data: "",
+  };
+  return modelResponse;
+}
+
 export async function assignRole(userId: string, role: string){
 const modelResponseCode = await UserModel.assignRole(userId, role);
 const modelResponse = {
@@ -47,19 +69,19 @@ async function getRoleId(userId: string){
 
 }
 
-async function getAssignedPermissionsForRole(role: string){
-  const data = await UserModel.getAssignedPermissionsForRole(role);
+async function getAssignedPermissionsForRole(roleId: string){
+  const data = await UserModel.getAssignedPermissionsForRole(roleId);
   return data;
 }
 
 export async function getAssignedPermission(userId: string){
 const roleId = await getRoleId(userId);
 if(roleId!.length == 0){
-  return {error: "No RoleId found"};
+  return [];
 }
 const permissions = await getAssignedPermissionsForRole(roleId![0]);
 if(permissions!.length == 0){
-  return {error: "No Permissions found"};
+  return [];
 }
-return permissions;
+return permissions![0];
 }

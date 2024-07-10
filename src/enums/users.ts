@@ -1,6 +1,6 @@
 export enum roles{
-    admin = "admin",
-    user = "user"
+    admin = "1",
+    user = "2"
 }
 
 export enum permissions{
@@ -8,8 +8,8 @@ export enum permissions{
     delete_todo = 'delete_todo',
     update_todo = 'update_todo',
     view_todo = 'view_todo',
-    delete_any_todo = 'delete_any_todo',
-    update_any_todo = 'update_any_todo',
-    view_all_todo = 'view_all_todo'
+    create_user = 'create_user',
+    delete_user = 'delete_user',
+    edit_user = 'edit_user',
 }
 

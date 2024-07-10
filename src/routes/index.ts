@@ -7,7 +7,7 @@ import { auth, authorize } from "../middleware/auth";
 const router = express();
 
 router.use("/todos", auth, todosRouter);
-router.use("/users", usersRouter);
+router.use("/users", auth, usersRouter);
 router.use("/auth", authRouter);
 
 export default router;

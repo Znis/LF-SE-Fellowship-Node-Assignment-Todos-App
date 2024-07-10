@@ -1,7 +1,6 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-    // Assuming users table exists and has an id column
     await knex.schema.createTable('users_roles', (table) => {
         table.increments('id').primary();
         table.integer('user_id').unsigned().notNullable();

@@ -16,9 +16,10 @@ export async function seed(knex: Knex): Promise<void> {
                 'delete_todo',
                 'update_todo',
                 'view_todo',
-                'delete_any_todo',
-                'update_any_todo',
-                'view_all_todo'
+                'create_user',
+                'delete_user',
+                'edit_user'
+
             ]
         },
         {
