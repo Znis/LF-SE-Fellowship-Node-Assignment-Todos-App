@@ -3,8 +3,8 @@ import * as UsersService from "../services/users";
 import userSchema from "../schema/user";
 
 export async function getUserByEmail(req: Request, res: Response) {
-  const email = req.body;
-  const data = await UsersService.getUserByEmail(email);
+  const body = req.body;
+  const data = await UsersService.getUserByEmail(body.email);
   if (data!.length > 0) {
     const modelResponse = {
       responseCode: 200,
