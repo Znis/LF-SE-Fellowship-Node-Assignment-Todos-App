@@ -1,14 +1,14 @@
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config from "../config";
 import { UnauthenticatedError } from "../../error/unauthenticatedError";
 import Iuser from "../interfaces/user";
+import { getAssignedPermission } from "../services/auth";
 
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
-
   if (!authorization) {
     return res.status(401).json({ error: "Authentication Failed" });
   }
@@ -21,23 +21,26 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     const verifiedData = jwt.verify(
       token[1],
       config.jwt.secret!
-    ) as Iuser ;
-    if (verifiedData) {
-      req.user = verifiedData;
+    ) as Iuser;
 
-    } else {
-      return res.status(401).json({ error: "Token Verification failed" });
-    }
+    if (!verifiedData) {
+      next(new UnauthenticatedError("Unauthenticated"));
+      return;
+    } 
+      req.user = verifiedData;
+      next();
   } catch {
+
     next(new UnauthenticatedError("Unauthenticated"));
   }
-  next();
+  
 }
 
 export function authorize (permission:string){
-  return (req:Request,res:Response,next:NextFunction)=>{
-      const user =req.user!;
-      if (!user.permissions.includes(permission)){
+  return async  (req:Request,res:Response,next:NextFunction)=> {
+      const user = req.user!;
+      const permissions = await getAssignedPermission(user.id!);
+      if (!permissions.includes(permission)){
           next (new Error('Forbidden'))
       }
       next();

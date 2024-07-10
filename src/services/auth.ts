@@ -1,9 +1,10 @@
-import jwt, { JwtPayload, sign } from "jsonwebtoken";
+import jwt, {sign } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import Iuser from "../interfaces/user";
 import config from "../config";
 import { getUserByEmail } from "./users";
 import { Request, Response } from "express";
+import { getAssignedPermission as getAssignedPermissionFromUserService } from "./users";
 
 export async function login(
   req: Request,
@@ -65,4 +66,9 @@ export async function refresh(
   } catch {
     return res.json({ error: "Invalid Token", status: 401 });
   }
+}
+
+export async function getAssignedPermission(userId: string){
+const permissions = await getAssignedPermissionFromUserService(userId);
+return permissions;
 }
