@@ -9,7 +9,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-RUN npm run migrate
 
 # Set a default port value if not provided
 ARG PORT=8000
@@ -18,6 +17,3 @@ ENV PORT=${PORT}
 # Expose the port
 EXPOSE ${PORT}
 
-
-# Start node server
-CMD ["npm", "start"]

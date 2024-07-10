@@ -12,7 +12,7 @@ export async function getUserByEmail(email: string) {
       .where("email", email)
       .then(function (data) {
         return data;
-      });
+      }) as Iuser[];
     if (resultData.length > 0) {
       return resultData;
     } else {

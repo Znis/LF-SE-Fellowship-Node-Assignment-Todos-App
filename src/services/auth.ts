@@ -5,12 +5,6 @@ import config from "../config";
 import { getUserByEmail } from "./users";
 import { Request, Response } from "express";
 
-interface CustomJwtPayload extends JwtPayload {
-  id: string;
-  name: string;
-  email: string;
-}
-
 export async function login(
   req: Request,
   res: Response,
@@ -28,16 +22,11 @@ export async function login(
   if (!isValidPassword) {
     return res.status(401).json({ error: "Invalid Credentials" });
   }
-  const payload = {
-    id: existingUser![0].id,
-    name: existingUser![0].name,
-    email: existingUser![0].email,
-  };
 
-  const accessToken = sign(payload, config.jwt.secret!, {
+  const accessToken = sign(existingUser![0], config.jwt.secret!, {
     expiresIn: config.jwt.accessTokenExpiry,
   });
-  const refreshToken = sign(payload, config.jwt.secret!, {
+  const refreshToken = sign(existingUser![0], config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiry,
   });
   return res
@@ -62,15 +51,11 @@ export async function refresh(
     const verifiedData = jwt.verify(
       token[1],
       config.jwt.secret!
-    ) as CustomJwtPayload;
+    ) as Iuser;
     if (verifiedData) {
-      const payload = {
-        id: verifiedData.id,
-        name: verifiedData.name,
-        email: verifiedData.email,
-      };
 
-      const accessToken = sign(payload, config.jwt.secret!, {
+
+      const accessToken = sign(verifiedData, config.jwt.secret!, {
         expiresIn: config.jwt.accessTokenExpiry,
       });
       return res.json({ error: "", status: 200, data: accessToken });

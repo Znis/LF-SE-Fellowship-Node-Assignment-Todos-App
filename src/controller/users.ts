@@ -1,25 +1,17 @@
 import { Request, Response } from "express";
 import * as UsersService from "../services/users";
 import userSchema from "../schema/user";
+import Iuser from "../interfaces/user";
+
 
 export async function getUserByEmail(req: Request, res: Response) {
-  const user = req.body;
-  const { error, value } = userSchema.validate(user);
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-  const data = await UsersService.getUserByEmail(value.email);
+  const body = req.body;
+  const data = await UsersService.getUserByEmail(body.email);
+  const {password, ...otherData} = data![0];
   if (data!.length > 0) {
-    const modelResponse = {
-      responseCode: 200,
-    };
-    return modelResponse;
+    return res.status(200).json({otherData});
   } else {
-    const modelResponse = {
-      responseCode: 401,
-      responseMessage: "Invalid User",
-    };
-    return modelResponse;
+    return res.status(401).json({error: "Invalid User"});
   }
 }
 

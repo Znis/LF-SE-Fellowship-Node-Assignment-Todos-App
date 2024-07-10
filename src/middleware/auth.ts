@@ -1,18 +1,12 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { Request } from "../interfaces/auth";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
+import { UnauthenticatedError } from "../../error/unauthenticatedError";
+import Iuser from "../interfaces/user";
 
-interface CustomRequest extends Request {
-  userId?: string;
-}
 
-interface CustomJwtPayload extends JwtPayload {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export function auth(req: CustomRequest, res: Response, next: NextFunction) {
+export function auth(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
 
   if (!authorization) {
@@ -27,14 +21,25 @@ export function auth(req: CustomRequest, res: Response, next: NextFunction) {
     const verifiedData = jwt.verify(
       token[1],
       config.jwt.secret!
-    ) as CustomJwtPayload;
+    ) as Iuser ;
     if (verifiedData) {
-      req.userId = verifiedData.id.toString();
-      next();
+      req.user = verifiedData;
+
     } else {
       return res.status(401).json({ error: "Token Verification failed" });
     }
   } catch {
-    return res.json({ error: "Token Expired", errorCode: 401 });
+    next(new UnauthenticatedError("Unauthenticated"));
+  }
+  next();
+}
+
+export function authorize (permission:string){
+  return (req:Request,res:Response,next:NextFunction)=>{
+      const user =req.user!;
+      if (!user.permissions.includes(permission)){
+          next (new Error('Forbidden'))
+      }
+      next();
   }
 }
