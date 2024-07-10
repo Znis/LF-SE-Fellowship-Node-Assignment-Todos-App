@@ -2,17 +2,28 @@
 
 Todo App is an application that lets you add your todos and keep track of them.  
 The repository contains following branches:  
-- main  
-It contains the API or node server that handles the CRUD operation of the Todo app, fulfilling basic requirements of the assignment.    
+- assignment-1  
+It contains the API or node server that handles the CRUD operation of the Todo app, fulfilling basic requirements of the assignment 1.    
 GET /todos/ -> fetch all the todos.  
 POST /todos/ -> Create the new todo.  
 PUT /todos/:id -> Update the existing todo.  
 DELETE /todos/:id -> Delete the exisiting todo.  
 It has no active database. Instead, it uses a local variable containing few todos item.  
-The image is available at the Dockerhub. It can be build with the following tag 'znis/todoapp:latest'.    
+The image is available at the Dockerhub. It can be build with the following tag 'znis/todoapp:latest'.   
+
+- assignment-2  
+It extends the feature of assignment with authentication system, JWT tokens and database.    
+The app can be run on docker with docker-compose command. 
+Clone the repo and switch to branch assignment-2 and run the command.    
+Create a .env file and specify the necessary args as given in .env.example.
+  
+Run the following commands.
+```bash
+docker-compose up
+```
 
 - backend  
-It contains the API or node server that handles the CRUD operation of the Todo app as well as user authentication too.  
+It contains the API or node server that handles the CRUD operation of the Todo app as well as user authentication too with JWT tokens.  
 It contains an active remote database. The database is PostgreSQL database provided by free database service provider ElephantSQL.  
 The API is hosted in free hosting platform Render.  
 The API endpoint is
@@ -40,4 +51,12 @@ Run the following commands.
 npm install
 npm start
 ```
+OR,  
 
+Clone the repo and switch to branch assignment-2 and run the command.    
+Create a .env file and specify the necessary args as given in .env.example.
+  
+Run the following commands.
+```bash
+docker-compose up
+```
