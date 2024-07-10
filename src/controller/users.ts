@@ -3,12 +3,8 @@ import * as UsersService from "../services/users";
 import userSchema from "../schema/user";
 
 export async function getUserByEmail(req: Request, res: Response) {
-  const user = req.body;
-  const { error, value } = userSchema.validate(user);
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-  const data = await UsersService.getUserByEmail(value.email);
+  const email = req.body;
+  const data = await UsersService.getUserByEmail(email);
   if (data!.length > 0) {
     const modelResponse = {
       responseCode: 200,
