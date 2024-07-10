@@ -1,0 +1,47 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:8.9
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
+    ports:
+      - "5050:80"
+    restart: always
+    depends_on:
+      - postgres
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_PORT=${DB_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
+      - DB_CLIENT=${DB_CLIENT}
+    ports:
+      - "80:${PORT}"
+    command: bash -c "npm run migrate && npm start"
+
+    restart: always
+    depends_on: [postgres]

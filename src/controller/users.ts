@@ -5,9 +5,9 @@ import userSchema from "../schema/user";
 export async function getUserByEmail(req: Request, res: Response) {
   const body = req.body;
   const data = await UsersService.getUserByEmail(body.email);
-
+  const {password, ...otherData} = data![0];
   if (data!.length > 0) {
-    return res.status(200).json({data});
+    return res.status(200).json({otherData});
   } else {
     return res.status(401).json({error: "Invalid User"});
   }

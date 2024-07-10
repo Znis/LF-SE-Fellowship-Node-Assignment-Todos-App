@@ -28,16 +28,12 @@ export async function login(
   if (!isValidPassword) {
     return res.status(401).json({ error: "Invalid Credentials" });
   }
-  const payload = {
-    id: existingUser![0].id,
-    name: existingUser![0].name,
-    email: existingUser![0].email,
-  };
 
-  const accessToken = sign(payload, config.jwt.secret!, {
+
+  const accessToken = sign(existingUser![0], config.jwt.secret!, {
     expiresIn: config.jwt.accessTokenExpiry,
   });
-  const refreshToken = sign(payload, config.jwt.secret!, {
+  const refreshToken = sign(existingUser![0], config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiry,
   });
   return res
