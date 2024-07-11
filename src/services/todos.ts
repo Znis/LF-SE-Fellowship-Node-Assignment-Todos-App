@@ -12,29 +12,26 @@ export async function getTodos(userId: string) {
 export async function createTodos(userId: string, data: Itodos) {
   const { modelResponseCode, queryResult } = await TodosModel.createTodos(userId, data);
   if(modelResponseCode != 200){
-    return createResponse(new ModelError("Could not create Todo"), undefined);
+    throw new ModelError;
   }
-  return createResponse(undefined, queryResult);
+  return queryResult;
 
 }
 
 export async function updateTodos(userId: string, id: string, data: Itodos) {
   const { modelResponseCode, queryResult } = await TodosModel.updateTodosById(userId, id, data);
   if(modelResponseCode != 200){
-    return createResponse(new ModelError("Could not update Todo"), undefined);
+   throw new ModelError("Could not update Todo");
   }
-  return createResponse(undefined, queryResult);
+  return queryResult;
 
 }
 
 export async function deleteTodos(userId: string, id: string) {
   const { modelResponseCode, queryResult } = await TodosModel.deleteTodosById(userId, id);
   if(modelResponseCode != 200){
-    return createResponse(new ModelError("Could not delete Todo"), undefined);
+    throw new ModelError("Could not delete Todo");
   }
-  return createResponse(undefined, queryResult);
+  return queryResult;
 }
 
-function createResponse(error?, queryResult?){
-  return {error: error || null, queryResult: queryResult || null};
-}

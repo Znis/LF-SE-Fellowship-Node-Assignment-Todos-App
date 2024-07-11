@@ -15,14 +15,14 @@ export async function createUser(user: Iuser) {
 
   const createUserResponse = await UserModel.createUser(user);
   if(createUserResponse.modelResponseCode != 200){
-    return createResponse(new ModelError("Could not create User"), undefined);
+     throw new ModelError("Could not create User");
   }
 
     const newUser = await getUserByEmail(user.email);
 
     await assignRole(newUser!.id!, roles.user);
 
-    return createResponse(undefined, createUserResponse.queryResult);
+    return createUserResponse.queryResult;
 
 }
 
@@ -31,27 +31,27 @@ export async function editUser(id: string, user: Iuser) {
   user.password = hashedPassword;
   const { modelResponseCode, queryResult } = await UserModel.editUserById(id, user);
   if(modelResponseCode != 200){
-    return createResponse(new ModelError("Could not edit User"), undefined);
+    throw new ModelError("Could not edit User");
   }
-  return createResponse(undefined, queryResult);
+  return queryResult;
 
 }
 
 export async function deleteUser(id: string) {
   const { modelResponseCode, queryResult } = await UserModel.deleteUserById(id);
   if(modelResponseCode != 200){
-    return createResponse(new ModelError("Could not delete User"), undefined);
+    throw new ModelError("Could not delete User");
   }
-  return createResponse(undefined, queryResult);
+  return queryResult;
 
 }
 
 export async function assignRole(userId: string, role: string){
 const { modelResponseCode, queryResult } = await UserModel.assignRole(userId, role);
 if(modelResponseCode != 200){
-  return createResponse(new ModelError("Could not assign Role"), undefined);
+  throw new ModelError("Could not assign Role");
 }
-return createResponse(undefined, queryResult);
+return queryResult;
 
 }
 
@@ -78,6 +78,3 @@ if(!permissions!.length){
 return permissions![0];
 }
 
-function createResponse(error?, queryResult?){
-  return {error: error || null, queryResult: queryResult || null};
-}

@@ -16,7 +16,8 @@ export async function login(
   const existingUser = await getUserByEmail(body.email);
 
   if (!existingUser) {
-    return createResponse(new UnauthenticatedError("Invalid Credentials"), undefined);
+    throw new UnauthenticatedError("Invalid Credentials");
+
 
   }
   const isValidPassword = await bcrypt.compare(
@@ -24,7 +25,8 @@ export async function login(
     existingUser.password
   );
   if (!isValidPassword) {
-    return createResponse(new UnauthenticatedError("Invalid Credentials"), undefined);
+    throw new UnauthenticatedError("Invalid Credentials");
+
 
 
   }
@@ -35,7 +37,7 @@ export async function login(
   const refreshToken = sign(existingUser, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiry,
   });
-  return createResponse(undefined, { accessToken: accessToken, refreshToken: refreshToken });
+  return { accessToken: accessToken, refreshToken: refreshToken };
 
 }
 
@@ -45,12 +47,13 @@ export async function refresh(
   authorization: string | undefined
 ) {
   if (!authorization) {
-    return createResponse(new UnauthenticatedError("No Authorization Parameters"), undefined);
+    throw new UnauthenticatedError("No Authorization Headers");
 
   }
   const token = authorization.split(" ");
   if (token.length !== 2 || token[0] !== "Bearer") {
-    return createResponse(new UnauthenticatedError("No Bearer Token"), undefined);
+    throw new UnauthenticatedError("No Bearer Token");
+
 
 
   }
@@ -66,15 +69,17 @@ export async function refresh(
       const accessToken = sign(verifiedData, config.jwt.secret!, {
         expiresIn: config.jwt.accessTokenExpiry,
       });
-      return createResponse(undefined, accessToken);
+      return accessToken;
 
 
     } else {
-      return createResponse(new UnauthenticatedError("Invalid Token"), undefined);
+          throw new UnauthenticatedError("Invalid Token");
+
 
     }
   } catch {
-    return createResponse(new UnauthenticatedError("Token Verification Error"), undefined);
+    throw new UnauthenticatedError("Token Verification Error");
+    
 
   }
 }
@@ -84,6 +89,3 @@ const permissions = await getAssignedPermissionFromUserService(userId);
 return permissions;
 }
 
-function createResponse(error?, queryResult?){
-  return {error: error || null, queryResult: queryResult || null};
-}

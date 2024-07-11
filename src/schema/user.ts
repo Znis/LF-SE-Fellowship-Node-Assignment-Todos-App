@@ -1,9 +1,18 @@
 import joi from "joi";
 
-const userSchema = joi.object({
+export const userSchema = joi.object({
         name: joi.string().required(),
         email: joi.string().required(),
         password: joi.string().required(),
 });
 
-export default userSchema;
+
+export const getUserQuerySchema = joi.object({
+        q: joi.string().optional(),
+   
+        page: joi.number().optional().messages({
+             "number.base": "page must be a number",
+        }),
+   }).options({
+        stripUnknown: true,
+   });

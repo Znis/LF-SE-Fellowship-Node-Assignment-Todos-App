@@ -12,22 +12,27 @@ export async function getTodos(
 ) {
   const currUserId = req.user!.id;
   const data = await TodosService.getTodos(currUserId!);
-  res.status(HttpStatusCode.OK).json(data);
+  return res.status(HttpStatusCode.OK).json(data);
 }
 export async function createTodos(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const currUserId = req.user!.id;
-  const data = req.body;
-  const { error, value } = todosSchema.validate(data);
-  if (error) {
-    next(new SchemaError("Input Data Invalid"));
-    return;
+  try{
+    const currUserId = req.user!.id;
+    const data = req.body;
+    const { error, value } = todosSchema.validate(data);
+    if (error) {
+      next(new SchemaError("Input Data Invalid"));
+      return;
+    }
+    const response = await TodosService.createTodos(currUserId!, value);
+    return res.status(HttpStatusCode.CREATED).json(response);
+  }catch(error){
+next(error);
   }
-  const response = await TodosService.createTodos(currUserId!, value);
-  res.status(HttpStatusCode.CREATED).json(response);
+  
 
 }
 export async function updateTodos(
@@ -35,27 +40,37 @@ export async function updateTodos(
   res: Response,
   next: NextFunction
 ) {
-  const currUserId = req.user!.id;
+  try{
+    const currUserId = req.user!.id;
 
-  const { id } = req.params;
-  const data = req.body;
-  const { error, value } = todosSchema.validate(data);
-  if (error) {
-    next(new SchemaError("Input Data Invalid"));
-    return;
+    const { id } = req.params;
+    const data = req.body;
+    const { error, value } = todosSchema.validate(data);
+    if (error) {
+      next(new SchemaError("Input Data Invalid"));
+      return;
+    }
+    const response = await TodosService.updateTodos(currUserId!, id, value);
+    return res.status(HttpStatusCode.OK).json(response);
+  }catch(error){
+next(error);
   }
-  const response = await TodosService.updateTodos(currUserId!, id, value);
-  res.status(HttpStatusCode.OK).json(response);
+
 }
 export async function deleteTodos(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const currUserId = req.user!.id;
-  const { id } = req.params;
-  await TodosService.deleteTodos(currUserId!, id);
+  try{
+    const currUserId = req.user!.id;
+    const { id } = req.params;
+    await TodosService.deleteTodos(currUserId!, id);
+  
+    return res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
+  }catch(error){
+ next(error);
+  }
 
-  res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
 
 }
