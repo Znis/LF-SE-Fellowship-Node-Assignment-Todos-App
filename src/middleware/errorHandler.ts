@@ -6,10 +6,14 @@ import { BadRequestError } from "../error/badRequestError";
 import { ModelError } from "../error/modelError";
 import { SchemaError } from "../error/schemaError";
 import { ForbiddenError } from "../error/forbiddenError";
+import loggerWithNameSpace from "../utils/logger";
+
+const logger = loggerWithNameSpace("Error Handler Middleware");
 
 export function notFoundError(req: Request, res: Response) {
+  logger.error("Resource not found");
   return res.status(HttpStatusCode.NOT_FOUND).json({
-    message: "Not Found",
+    message: "Resource Not Found",
   });
 }
 export function genericErrorHandler(
@@ -18,33 +22,41 @@ export function genericErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  if (error instanceof UnauthenticatedError) {
-    return res
-      .status(HttpStatusCode.UNAUTHORIZED)
-      .json({ message: error.message });
-  }
+  switch (error.constructor) {
+    case UnauthenticatedError:
+      logger.error("User Unauthenticated");
+      return res
+        .status(HttpStatusCode.UNAUTHORIZED)
+        .json({ message: error.message });
+  
+    case BadRequestError:
+      logger.error("Bad request error");
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json({ message: error.message });
 
-  if (error instanceof BadRequestError) {
-    return res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .json({ message: error.message });
+    case SchemaError:
+      logger.error("Input data schema error");
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json({ message: error.message });
+
+    case ModelError:
+      logger.error("Model response error");
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json({ message: error.message });
+  
+    case ForbiddenError:
+      logger.error("Forbidden resource error");
+      return res
+        .status(HttpStatusCode.FORBIDDEN)
+        .json({ message: error.message });
+  
+    default:
+      logger.error("Internal server error");
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+        message: "Internal Server Error",
+      });
   }
-  if (error instanceof SchemaError) {
-    return res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .json({ message: error.message });
-  }
-  if (error instanceof ModelError) {
-    return res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .json({ message: error.message });
-  }
-  if (error instanceof ForbiddenError) {
-    return res
-      .status(HttpStatusCode.FORBIDDEN)
-      .json({ message: error.message });
-  }
-  return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-    message: "Internal Server Error",
-  });
 }

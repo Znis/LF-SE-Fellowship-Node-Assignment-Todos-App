@@ -1,11 +1,14 @@
 import { baseKnexConfig } from "../knexFile";
 import knex from "knex";
 import Itodos from "../interfaces/todos";
+import loggerWithNameSpace from "../utils/logger";
 
 const knexInstance = knex(baseKnexConfig);
+const logger = loggerWithNameSpace("Todos Model");
 
 export async function getTodos(userId: string) {
   try {
+    logger.info("Querying database to get Todos");
     const resultData = await knexInstance
       .select("*")
       .from("todos")
@@ -13,14 +16,18 @@ export async function getTodos(userId: string) {
       .then(function (data) {
         return data;
       });
+    logger.info("Query to get Todos completed");
     return resultData;
   } catch (error) {
+    logger.error("Query to get Todos could not be completed");
     console.log(error);
   }
 }
 
 export async function createTodos(userId: string, todos: Itodos) {
   try {
+
+    logger.info("Attempting to insert Todo in database");
     const databaseInsert = await knexInstance
       .insert({
         title: todos.title,
@@ -38,8 +45,11 @@ export async function createTodos(userId: string, todos: Itodos) {
           queryResult: todos,
         };
       });
+
+    logger.info("Insertion of Todo in database completed");
     return databaseInsert;
   } catch (error) {
+    logger.error("Insertion of Todo in database could not be completed");
     console.log(error);
     return {
       modelResponseCode: 400,
@@ -53,13 +63,17 @@ export async function updateTodosById(
   todo: Itodos
 ) {
   try {
+    logger.info("Atemmpting to verify Todo ownership");
     const ownership = await checkTodoOwnership(userId, id);
     if(!ownership){
+      logger.error("Todo ownership could not be verified");
       return {
         modelResponseCode: 403,
         queryResult: null
       };
     }
+    logger.info("Todo ownership verified");
+    logger.info("Attempting to update Todo in database");
     const resultData = await knexInstance("todos")
       .where("id", id)
       .update({
@@ -83,9 +97,11 @@ export async function updateTodosById(
           queryResult: todo,
         };
       });
+      logger.info("Updation of Todo in database completed");
       return resultData;
  
   } catch (error) {
+    logger.error("Updation of Todo in database could not be completed");
     console.log(error);
     return {
       modelResponseCode: 400,
@@ -95,13 +111,16 @@ export async function updateTodosById(
 }
 export async function deleteTodosById(userId: string, id: string) {
   try {
+    logger.info("Atemmpting to verify Todo ownership");
     const ownership = await checkTodoOwnership(userId, id);
     if(!ownership){
+      logger.error("Todo ownership could not be verified");
       return {
         modelResponseCode: 403,
         queryResult: null
       };
-    }
+    }    
+    logger.info("Attempting to delete Todo from database");
     const resultData = await knexInstance("todos")
       .where("id", id)
       .andWhere("user_id", userId)
@@ -118,8 +137,10 @@ export async function deleteTodosById(userId: string, id: string) {
           queryResult: true,
         };
       });
+    logger.info("Deletion of Todo from database completed");
     return resultData;
   } catch (error) {
+    logger.error("Deletion of Todo from database could not be completed");
     console.log(error);
     return {
       modelResponseCode: 400,
