@@ -1,4 +1,4 @@
-import { permissions } from './../enums/users';
+import { permissions } from "./../enums/users";
 import { baseKnexConfig } from "../knexFile";
 import knex from "knex";
 import Iuser from "../interfaces/user";
@@ -7,17 +7,17 @@ const knexInstance = knex(baseKnexConfig);
 
 export async function getUserByEmail(email: string) {
   try {
-    const resultData = await knexInstance
+    const resultData = (await knexInstance
       .select("*")
       .from("users")
       .where("email", email)
       .then(function (data) {
         return data;
-      }) as Iuser[];
-      if (!resultData.length) {
-    return null;
-      }
-      return resultData[0];
+      })) as Iuser[];
+    if (!resultData.length) {
+      return null;
+    }
+    return resultData[0];
   } catch (error) {
     console.log(error);
   }
@@ -35,7 +35,7 @@ export async function createUser(user: Iuser) {
       .then(function () {
         return {
           modelResponseCode: 200,
-          queryResult: user
+          queryResult: user,
         };
       });
 
@@ -44,65 +44,61 @@ export async function createUser(user: Iuser) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: null
+      queryResult: null,
     };
   }
 }
 
-export async function assignRole(userId: string, role: string){
-try{   
-  const databaseInsert = await knexInstance
-  .insert({
-    user_id: userId,
-    role_id: role
-  })
-  .into("users_roles")
-  .then(function (data) {
+export async function assignRole(userId: string, role: string) {
+  try {
+    const databaseInsert = await knexInstance
+      .insert({
+        user_id: userId,
+        role_id: role,
+      })
+      .into("users_roles")
+      .then(function (data) {
+        return {
+          modelResponseCode: 200,
+          queryResult: data,
+        };
+      });
+    return databaseInsert;
+  } catch (error) {
+    console.log(error);
     return {
-      modelResponseCode: 200,
-      queryResult: data
+      modelResponseCode: 400,
+      queryResult: null,
     };
-  });
-return databaseInsert;
-} catch (error) {
-console.log(error);
-return {
-  modelResponseCode: 400,
-  queryResult: null
-};
+  }
 }
-}
-export async function editUserById(
-  id: string,
-  user: Iuser
-) {
+export async function editUserById(id: string, user: Iuser) {
   try {
     const resultData = await knexInstance("users")
       .where("id", id)
       .update({
         name: user.name,
         email: user.email,
-        password: user.password
-
+        password: user.password,
       })
       .then(function (data) {
         if (!data) {
           return {
             modelResponseCode: 400,
-            queryResult: null
+            queryResult: null,
           };
-        } 
+        }
         return {
           modelResponseCode: 200,
-          queryResult: user
-        }
+          queryResult: user,
+        };
       });
-return resultData;
+    return resultData;
   } catch (error) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: null
+      queryResult: null,
     };
   }
 }
@@ -115,24 +111,24 @@ export async function deleteUserById(id: string) {
         if (!data) {
           return {
             modelResponseCode: 400,
-            queryResult: false
+            queryResult: false,
           };
-        } 
+        }
         return {
           modelResponseCode: 200,
-          queryResult: true
-        }
+          queryResult: true,
+        };
       });
-      return resultData;
+    return resultData;
   } catch (error) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: false
+      queryResult: false,
     };
   }
 }
-export async function getRoleId(userId: string){
+export async function getRoleId(userId: string) {
   try {
     const resultData = await knexInstance
       .select("role_id")
@@ -141,17 +137,16 @@ export async function getRoleId(userId: string){
       .then(function (data) {
         return data;
       });
-      if(!resultData.length){
-        return [];
-      }
-      return [resultData[0].role_id];
-
+    if (!resultData.length) {
+      return [];
+    }
+    return [resultData[0].role_id];
   } catch (error) {
     console.log(error);
   }
 }
 
-export async function getAssignedPermissionsForRole(roleId: string){
+export async function getAssignedPermissionsForRole(roleId: string) {
   try {
     const resultData = await knexInstance
       .select("permissions")
@@ -160,11 +155,10 @@ export async function getAssignedPermissionsForRole(roleId: string){
       .then(function (data) {
         return data;
       });
-      if(!resultData.length){
-        return [];
-      }
-      return [resultData[0].permissions];
-   
+    if (!resultData.length) {
+      return [];
+    }
+    return [resultData[0].permissions];
   } catch (error) {
     console.log(error);
   }

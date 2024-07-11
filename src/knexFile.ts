@@ -1,12 +1,10 @@
 import config from "./config";
 import { Knex } from "knex";
 
-
-
 const { database: dbConfig } = config;
 
 export const baseKnexConfig = {
-  client: dbConfig.client || 'pg',
+  client: dbConfig.client || "pg",
   connection: {
     database: dbConfig.database,
     host: dbConfig.host,
@@ -15,7 +13,6 @@ export const baseKnexConfig = {
     user: dbConfig.user,
   },
 };
-
 
 const knexConfig: Knex.Config = {
   ...baseKnexConfig,
@@ -26,6 +23,5 @@ const knexConfig: Knex.Config = {
     directory: "./database/seeds",
   },
 };
-
 
 export default knexConfig;

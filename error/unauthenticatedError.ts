@@ -1,5 +1,3 @@
 import { BaseError } from "./baseError";
 
-export class UnauthenticatedError extends BaseError{
-    
-}
+export class UnauthenticatedError extends BaseError {}

@@ -13,7 +13,7 @@ export async function getTodos(userId: string) {
       .then(function (data) {
         return data;
       });
-      return resultData;
+    return resultData;
   } catch (error) {
     console.log(error);
   }
@@ -35,15 +35,15 @@ export async function createTodos(userId: string, todos: Itodos) {
       .then(function () {
         return {
           modelResponseCode: 200,
-          queryResult: todos
+          queryResult: todos,
         };
       });
-return databaseInsert;
+    return databaseInsert;
   } catch (error) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: null
+      queryResult: null,
     };
   }
 }
@@ -68,21 +68,21 @@ export async function updateTodosById(
         if (!data) {
           return {
             modelResponseCode: 400,
-            queryResult: null
+            queryResult: null,
           };
         }
         return {
           modelResponseCode: 200,
-          queryResult: todos
+          queryResult: todos,
         };
       });
- return resultData;
+    return resultData;
   } catch (error) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: null
-    };;
+      queryResult: null,
+    };
   }
 }
 export async function deleteTodosById(userId: string, id: string) {
@@ -95,20 +95,20 @@ export async function deleteTodosById(userId: string, id: string) {
         if (!data) {
           return {
             modelResponseCode: 400,
-            queryResult: false
+            queryResult: false,
           };
-        } 
+        }
         return {
           modelResponseCode: 200,
-          queryResult: true
+          queryResult: true,
         };
       });
-return resultData;
+    return resultData;
   } catch (error) {
     console.log(error);
     return {
       modelResponseCode: 400,
-      queryResult: false
+      queryResult: false,
     };
   }
 }

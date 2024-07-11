@@ -6,7 +6,6 @@ import { UnauthenticatedError } from "../../error/unauthenticatedError";
 import Iuser from "../interfaces/user";
 import { getAssignedPermission } from "../services/auth";
 
-
 export function auth(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
   if (!authorization) {
@@ -18,34 +17,28 @@ export function auth(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-
-    const verifiedData = jwt.verify(
-      token[1],
-      config.jwt.secret!
-    ) as Iuser;
+    const verifiedData = jwt.verify(token[1], config.jwt.secret!) as Iuser;
     if (!verifiedData) {
       next(new UnauthenticatedError("Unauthenticated"));
       return;
-    } 
-      req.user = verifiedData;
+    }
+    req.user = verifiedData;
 
-      next();
+    next();
   } catch {
-
     next(new UnauthenticatedError("Unauthenticated"));
   }
-  
 }
 
-export function authorize (permission:string){
-  return async  (req:Request,res:Response,next:NextFunction)=> {
-      const user = req.user!;
+export function authorize(permission: string) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user!;
 
-      const permissions = await getAssignedPermission(user.id!);
-      if (!permissions!.includes(permission)){
-          next (new Error('Forbidden'));
-          return;
-      }
-      next();
-  }
+    const permissions = await getAssignedPermission(user.id!);
+    if (!permissions!.includes(permission)) {
+      next(new Error("Forbidden"));
+      return;
+    }
+    next();
+  };
 }

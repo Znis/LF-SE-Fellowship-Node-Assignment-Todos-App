@@ -1,9 +1,9 @@
-import HttpStatusCode from 'http-status-codes';
+import HttpStatusCode from "http-status-codes";
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import * as TodosService from "../services/todos";
 import todosSchema from "../schema/todos";
-import { SchemaError } from '../../error/schemaError';
+import { SchemaError } from "../../error/schemaError";
 
 export async function getTodos(
   req: Request,
@@ -19,7 +19,7 @@ export async function createTodos(
   res: Response,
   next: NextFunction
 ) {
-  try{
+  try {
     const currUserId = req.user!.id;
     const data = req.body;
     const { error, value } = todosSchema.validate(data);
@@ -29,18 +29,16 @@ export async function createTodos(
     }
     const response = await TodosService.createTodos(currUserId!, value);
     return res.status(HttpStatusCode.CREATED).json(response);
-  }catch(error){
-next(error);
+  } catch (error) {
+    next(error);
   }
-  
-
 }
 export async function updateTodos(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  try{
+  try {
     const currUserId = req.user!.id;
 
     const { id } = req.params;
@@ -52,25 +50,22 @@ export async function updateTodos(
     }
     const response = await TodosService.updateTodos(currUserId!, id, value);
     return res.status(HttpStatusCode.OK).json(response);
-  }catch(error){
-next(error);
+  } catch (error) {
+    next(error);
   }
-
 }
 export async function deleteTodos(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  try{
+  try {
     const currUserId = req.user!.id;
     const { id } = req.params;
     await TodosService.deleteTodos(currUserId!, id);
-  
+
     return res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
-  }catch(error){
- next(error);
+  } catch (error) {
+    next(error);
   }
-
-
 }
