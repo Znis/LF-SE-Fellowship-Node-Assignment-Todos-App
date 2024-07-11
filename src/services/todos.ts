@@ -2,6 +2,7 @@ import HttpStatusCode from "http-status-codes";
 import Itodos from "../interfaces/todos";
 import * as TodosModel from "../model/todos";
 import { ModelError } from "../../error/modelError";
+import { ForbiddenError } from "../../error/forbiddenError";
 
 export async function getTodos(userId: string) {
   const data = await TodosModel.getTodos(userId);
@@ -14,7 +15,7 @@ export async function createTodos(userId: string, data: Itodos) {
     data
   );
   if (modelResponseCode != 200) {
-    throw new ModelError();
+    throw new ModelError("Could not create Todo");
   }
   return queryResult;
 }
@@ -25,6 +26,9 @@ export async function updateTodos(userId: string, id: string, data: Itodos) {
     id,
     data
   );
+  if(modelResponseCode == 403){
+    throw new ForbiddenError("Forbidden");
+  }
   if (modelResponseCode != 200) {
     throw new ModelError("Could not update Todo");
   }
@@ -36,6 +40,9 @@ export async function deleteTodos(userId: string, id: string) {
     userId,
     id
   );
+  if(modelResponseCode == 403){
+    throw new ForbiddenError("Forbidden");
+  }
   if (modelResponseCode != 200) {
     throw new ModelError("Could not delete Todo");
   }

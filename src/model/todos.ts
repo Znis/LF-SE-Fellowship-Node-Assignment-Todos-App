@@ -50,18 +50,25 @@ export async function createTodos(userId: string, todos: Itodos) {
 export async function updateTodosById(
   userId: string,
   id: string,
-  todos: Itodos
+  todo: Itodos
 ) {
   try {
+    const ownership = await checkTodoOwnership(userId, id);
+    if(!ownership){
+      return {
+        modelResponseCode: 403,
+        queryResult: null
+      };
+    }
     const resultData = await knexInstance("todos")
       .where("id", id)
       .update({
-        title: todos.title,
-        description: todos.description,
-        completed: todos.completed,
-        dueDate: todos.dueDate,
-        priority: todos.priority,
-        category: todos.category,
+        title: todo.title,
+        description: todo.description,
+        completed: todo.completed,
+        dueDate: todo.dueDate,
+        priority: todo.priority,
+        category: todo.category,
         user_id: userId,
       })
       .then(function (data) {
@@ -73,10 +80,11 @@ export async function updateTodosById(
         }
         return {
           modelResponseCode: 200,
-          queryResult: todos,
+          queryResult: todo,
         };
       });
-    return resultData;
+      return resultData;
+ 
   } catch (error) {
     console.log(error);
     return {
@@ -87,6 +95,13 @@ export async function updateTodosById(
 }
 export async function deleteTodosById(userId: string, id: string) {
   try {
+    const ownership = await checkTodoOwnership(userId, id);
+    if(!ownership){
+      return {
+        modelResponseCode: 403,
+        queryResult: null
+      };
+    }
     const resultData = await knexInstance("todos")
       .where("id", id)
       .andWhere("user_id", userId)
@@ -110,5 +125,27 @@ export async function deleteTodosById(userId: string, id: string) {
       modelResponseCode: 400,
       queryResult: false,
     };
+  }
+}
+
+async function checkTodoOwnership(userId: string, id: string) {
+  try {
+    const resultData = (await knexInstance
+      .select("user_id")
+      .from("todos")
+      .where("id", id)
+
+      .then(function (data) {
+        return data;
+      }));
+      if(!resultData.length){
+        return false;
+      }
+    if (resultData[0].user_id == userId) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
   }
 }
