@@ -41,7 +41,7 @@ services:
       - DB_CLIENT=${DB_CLIENT}
     ports:
       - "${PORT}:${PORT}"
-    command: bash -c "npm run migrate && npm start"
+    command: bash -c "npm run migrate && npm run seed && npm start"
 
     restart: always
     depends_on: [postgres]
