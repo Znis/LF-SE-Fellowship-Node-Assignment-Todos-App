@@ -12,7 +12,7 @@ It extends the feature of assignment-1 with authentication system, JWT tokens an
 The app can be run on docker with docker-compose command. 
 
 - __assignment-3__  
-It extends the feature of assignment-2 with HTTP Status codes, Custom Error and Authorization with roles and permissions.   
+It extends the feature of assignment-2 with HTTP Status codes, Custom Error, Authorization with roles and permissions and logger.   
 Following are the usage routes for the API: 
    - Todos  
 POST /todos/ -> fetch all the todos.  
