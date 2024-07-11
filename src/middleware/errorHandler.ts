@@ -5,6 +5,7 @@ import { UnauthenticatedError } from "../../error/unauthenticatedError";
 import { BadRequestError } from "../../error/badRequestError";
 import { ModelError } from "../../error/modelError";
 import { SchemaError } from "../../error/schemaError";
+import { ForbiddenError } from "../../error/forbiddenError";
 
 export function notFoundError(req: Request, res: Response) {
   return res.status(HttpStatusCode.NOT_FOUND).json({
@@ -36,6 +37,11 @@ export function genericErrorHandler(
   if (error instanceof ModelError) {
     return res
       .status(HttpStatusCode.BAD_REQUEST)
+      .json({ message: error.message });
+  }
+  if (error instanceof ForbiddenError) {
+    return res
+      .status(HttpStatusCode.FORBIDDEN)
       .json({ message: error.message });
   }
   return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({

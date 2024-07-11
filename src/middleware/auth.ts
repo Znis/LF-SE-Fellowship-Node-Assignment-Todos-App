@@ -5,6 +5,7 @@ import config from "../config";
 import { UnauthenticatedError } from "../../error/unauthenticatedError";
 import Iuser from "../interfaces/user";
 import { getAssignedPermission } from "../services/auth";
+import { ForbiddenError } from "../../error/forbiddenError";
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
@@ -36,7 +37,7 @@ export function authorize(permission: string) {
 
     const permissions = await getAssignedPermission(user.id!);
     if (!permissions!.includes(permission)) {
-      next(new Error("Forbidden"));
+      next(new ForbiddenError("Forbidden"));
       return;
     }
     next();
