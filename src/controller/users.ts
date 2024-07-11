@@ -39,7 +39,7 @@ export async function createUser(
 
     const response = await UsersService.createUser(value);
 
-    return res.status(HttpStatusCode.CREATED).json(response);
+    return res.status(HttpStatusCode.CREATED).json({created:response});
   } catch (error) {
     next(error);
   }
@@ -58,7 +58,7 @@ export async function editUser(
       return;
     }
     const response = await UsersService.editUser(id, value);
-    return res.status(HttpStatusCode.OK).json(response);
+    return res.status(HttpStatusCode.OK).json({edited:response});
   } catch (error) {
     next(error);
   }

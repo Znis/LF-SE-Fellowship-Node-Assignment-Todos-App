@@ -28,7 +28,7 @@ export async function createTodos(
       return;
     }
     const response = await TodosService.createTodos(currUserId!, value);
-    return res.status(HttpStatusCode.CREATED).json(response);
+    return res.status(HttpStatusCode.CREATED).json({created:response});
   } catch (error) {
     next(error);
   }
@@ -49,7 +49,7 @@ export async function updateTodos(
       return;
     }
     const response = await TodosService.updateTodos(currUserId!, id, value);
-    return res.status(HttpStatusCode.OK).json(response);
+    return res.status(HttpStatusCode.OK).json({updated:response});
   } catch (error) {
     next(error);
   }
