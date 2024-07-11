@@ -2,13 +2,17 @@ import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import jwt from "jsonwebtoken";
 import config from "../config";
-import { UnauthenticatedError } from "../../error/unauthenticatedError";
+import { UnauthenticatedError } from "../error/unauthenticatedError";
 import Iuser from "../interfaces/user";
 import { getAssignedPermission } from "../services/auth";
-import { ForbiddenError } from "../../error/forbiddenError";
+import { ForbiddenError } from "../error/forbiddenError";
+import loggerWithNameSpace from "../utils/logger";
+
+const logger = loggerWithNameSpace("Auth Middleware");
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
+  logger.info("Checking authorization headers");
   if (!authorization) {
     return res.status(401).json({ error: "Authentication Failed" });
   }

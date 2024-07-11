@@ -1,8 +1,7 @@
-import HttpStatusCode from "http-status-codes";
 import Itodos from "../interfaces/todos";
 import * as TodosModel from "../model/todos";
-import { ModelError } from "../../error/modelError";
-import { ForbiddenError } from "../../error/forbiddenError";
+import { ModelError } from "../error/modelError";
+import { ForbiddenError } from "../error/forbiddenError";
 
 export async function getTodos(userId: string) {
   const data = await TodosModel.getTodos(userId);

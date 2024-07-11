@@ -1,11 +1,11 @@
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import HttpStatusCode from "http-status-codes";
-import { UnauthenticatedError } from "../../error/unauthenticatedError";
-import { BadRequestError } from "../../error/badRequestError";
-import { ModelError } from "../../error/modelError";
-import { SchemaError } from "../../error/schemaError";
-import { ForbiddenError } from "../../error/forbiddenError";
+import { UnauthenticatedError } from "../error/unauthenticatedError";
+import { BadRequestError } from "../error/badRequestError";
+import { ModelError } from "../error/modelError";
+import { SchemaError } from "../error/schemaError";
+import { ForbiddenError } from "../error/forbiddenError";
 
 export function notFoundError(req: Request, res: Response) {
   return res.status(HttpStatusCode.NOT_FOUND).json({

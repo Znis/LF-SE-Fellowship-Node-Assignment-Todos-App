@@ -6,7 +6,7 @@ import config from "../config";
 import { getUserByEmail } from "./users";
 import { Request, Response } from "express";
 import { getAssignedPermission as getAssignedPermissionFromUserService } from "./users";
-import { UnauthenticatedError } from "../../error/unauthenticatedError";
+import { UnauthenticatedError } from "../error/unauthenticatedError";
 
 export async function login(
   req: Request,

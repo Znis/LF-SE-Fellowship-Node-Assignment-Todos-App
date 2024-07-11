@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import Iuser from "../interfaces/user";
 import * as UserModel from "../model/users";
 import { roles } from "../enums/users";
-import { ModelError } from "../../error/modelError";
+import { ModelError } from "../error/modelError";
 
 export async function getUserByEmail(email: string) {
   const data = await UserModel.getUserByEmail(email);
@@ -10,7 +10,8 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function createUser(user: Iuser) {
-  const hashedPassword = await bcrypt.hash(user.password, 10);
+  const salt = 10;
+  const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
 
   const createUserResponse = await UserModel.createUser(user);
@@ -26,7 +27,8 @@ export async function createUser(user: Iuser) {
 }
 
 export async function editUser(id: string, user: Iuser) {
-  const hashedPassword = await bcrypt.hash(user.password, 10);
+  const salt = 10;
+  const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
   const { modelResponseCode, queryResult } = await UserModel.editUserById(
     id,
