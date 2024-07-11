@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import Iuser from "../interfaces/user";
 import * as UserModel from "../model/users";
 import { roles } from "../enums/users";
+import { ModelError } from "../../error/modelError";
 
 export async function getUserByEmail(email: string) {
   const data = await UserModel.getUserByEmail(email);
@@ -12,55 +13,46 @@ export async function createUser(user: Iuser) {
   const hashedPassword = await bcrypt.hash(user.password, 10);
   user.password = hashedPassword;
 
-  const modelResponseCode = await UserModel.createUser(user);
-  const modelResponse = {
-    responseCode: modelResponseCode,
-    responseMessage:
-      modelResponseCode == 200 ? "Creation Successful" : "Creation Failed",
-  };
-  if(modelResponse.responseCode == 200){
-    const userId = await getUserByEmail(user.email);
-    const assignRoleResponse = await assignRole(userId![0].id!, roles.user);
-    if(!(assignRoleResponse.responseCode == 200)){
-      return {
-        responseCode: 500,
-        responseMessage: "Role Assigning Failed"
-      };
-    }
+  const createUserResponse = await UserModel.createUser(user);
+  if(createUserResponse.modelResponseCode != 200){
+    return createResponse(new ModelError("Could not create User"), undefined);
   }
-  return modelResponse;
+
+    const newUser = await getUserByEmail(user.email);
+
+    await assignRole(newUser!.id!, roles.user);
+
+    return createResponse(undefined, createUserResponse.queryResult);
+
 }
 
 export async function editUser(id: string, user: Iuser) {
   const hashedPassword = await bcrypt.hash(user.password, 10);
   user.password = hashedPassword;
-  const modelResponseCode = await UserModel.editUserById(id, user);
-  const modelResponse = {
-    status: modelResponseCode,
-    error: modelResponseCode == 200 ? "" : "Update Failed",
-    data: "",
-  };
-  return modelResponse;
+  const { modelResponseCode, queryResult } = await UserModel.editUserById(id, user);
+  if(modelResponseCode != 200){
+    return createResponse(new ModelError("Could not edit User"), undefined);
+  }
+  return createResponse(undefined, queryResult);
+
 }
 
 export async function deleteUser(id: string) {
-  const modelResponseCode = await UserModel.deleteUserById(id);
-  const modelResponse = {
-    status: modelResponseCode,
-    error: modelResponseCode == 200 ? "" : "Deletion Failed",
-    data: "",
-  };
-  return modelResponse;
+  const { modelResponseCode, queryResult } = await UserModel.deleteUserById(id);
+  if(modelResponseCode != 200){
+    return createResponse(new ModelError("Could not delete User"), undefined);
+  }
+  return createResponse(undefined, queryResult);
+
 }
 
 export async function assignRole(userId: string, role: string){
-const modelResponseCode = await UserModel.assignRole(userId, role);
-const modelResponse = {
-  responseCode: modelResponseCode,
-  responseMessage:
-    modelResponseCode == 200 ? "Role Assignment Successful" : "Role Assignment Failed",
-};
-return modelResponse;
+const { modelResponseCode, queryResult } = await UserModel.assignRole(userId, role);
+if(modelResponseCode != 200){
+  return createResponse(new ModelError("Could not assign Role"), undefined);
+}
+return createResponse(undefined, queryResult);
+
 }
 
 async function getRoleId(userId: string){
@@ -76,12 +68,16 @@ async function getAssignedPermissionsForRole(roleId: string){
 
 export async function getAssignedPermission(userId: string){
 const roleId = await getRoleId(userId);
-if(roleId!.length == 0){
+if(!roleId!.length){
   return [];
 }
 const permissions = await getAssignedPermissionsForRole(roleId![0]);
-if(permissions!.length == 0){
+if(!permissions!.length){
   return [];
 }
 return permissions![0];
+}
+
+function createResponse(error?, queryResult?){
+  return {error: error || null, queryResult: queryResult || null};
 }

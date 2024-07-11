@@ -1,3 +1,4 @@
+import HttpStatusCode from 'http-status-codes';
 import jwt, {sign } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import Iuser from "../interfaces/user";
@@ -5,6 +6,7 @@ import config from "../config";
 import { getUserByEmail } from "./users";
 import { Request, Response } from "express";
 import { getAssignedPermission as getAssignedPermissionFromUserService } from "./users";
+import { UnauthenticatedError } from '../../error/unauthenticatedError';
 
 export async function login(
   req: Request,
@@ -13,26 +15,28 @@ export async function login(
 ) {
   const existingUser = await getUserByEmail(body.email);
 
-  if (!existingUser!.length) {
-    return res.status(401).json({ error: "Invalid Credentials" });
+  if (!existingUser) {
+    return createResponse(new UnauthenticatedError("Invalid Credentials"), undefined);
+
   }
   const isValidPassword = await bcrypt.compare(
     body.password,
-    existingUser![0].password
+    existingUser.password
   );
   if (!isValidPassword) {
-    return res.status(401).json({ error: "Invalid Credentials" });
+    return createResponse(new UnauthenticatedError("Invalid Credentials"), undefined);
+
+
   }
 
-  const accessToken = sign(existingUser![0], config.jwt.secret!, {
+  const accessToken = sign(existingUser, config.jwt.secret!, {
     expiresIn: config.jwt.accessTokenExpiry,
   });
-  const refreshToken = sign(existingUser![0], config.jwt.secret!, {
+  const refreshToken = sign(existingUser, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiry,
   });
-  return res
-    .status(200)
-    .json({ accessToken: accessToken, refreshToken: refreshToken });
+  return createResponse(undefined, { accessToken: accessToken, refreshToken: refreshToken });
+
 }
 
 export async function refresh(
@@ -41,11 +45,14 @@ export async function refresh(
   authorization: string | undefined
 ) {
   if (!authorization) {
-    return res.json({ error: "Authentication Failed", status: 401 });
+    return createResponse(new UnauthenticatedError("No Authorization Parameters"), undefined);
+
   }
   const token = authorization.split(" ");
   if (token.length !== 2 || token[0] !== "Bearer") {
-    return res.json({ error: "Authentication Failed", status: 401 });
+    return createResponse(new UnauthenticatedError("No Bearer Token"), undefined);
+
+
   }
 
   try {
@@ -59,16 +66,24 @@ export async function refresh(
       const accessToken = sign(verifiedData, config.jwt.secret!, {
         expiresIn: config.jwt.accessTokenExpiry,
       });
-      return res.json({ error: "", status: 200, data: accessToken });
+      return createResponse(undefined, accessToken);
+
+
     } else {
-      return res.json({ error: "Invalid Token", status: 401 });
+      return createResponse(new UnauthenticatedError("Invalid Token"), undefined);
+
     }
   } catch {
-    return res.json({ error: "Invalid Token", status: 401 });
+    return createResponse(new UnauthenticatedError("Token Verification Error"), undefined);
+
   }
 }
 
 export async function getAssignedPermission(userId: string){
 const permissions = await getAssignedPermissionFromUserService(userId);
 return permissions;
+}
+
+function createResponse(error?, queryResult?){
+  return {error: error || null, queryResult: queryResult || null};
 }

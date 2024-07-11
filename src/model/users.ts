@@ -14,11 +14,10 @@ export async function getUserByEmail(email: string) {
       .then(function (data) {
         return data;
       }) as Iuser[];
-    if (resultData.length > 0) {
-      return resultData;
-    } else {
-      return [];
-    }
+      if (!resultData.length) {
+    return null;
+      }
+      return resultData[0];
   } catch (error) {
     console.log(error);
   }
@@ -34,12 +33,19 @@ export async function createUser(user: Iuser) {
       })
       .into("users")
       .then(function () {
-        return 200;
+        return {
+          modelResponseCode: 200,
+          queryResult: user
+        };
       });
+
     return databaseInsert;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: null
+    };
   }
 }
 
@@ -51,13 +57,19 @@ try{
     role_id: role
   })
   .into("users_roles")
-  .then(function () {
-    return 200;
+  .then(function (data) {
+    return {
+      modelResponseCode: 200,
+      queryResult: data
+    };
   });
 return databaseInsert;
 } catch (error) {
 console.log(error);
-return 400;
+return {
+  modelResponseCode: 400,
+  queryResult: null
+};
 }
 }
 export async function editUserById(
@@ -74,16 +86,24 @@ export async function editUserById(
 
       })
       .then(function (data) {
-        if (data === 1) {
-          return 200;
-        } else {
-          return 400;
+        if (!data) {
+          return {
+            modelResponseCode: 400,
+            queryResult: null
+          };
+        } 
+        return {
+          modelResponseCode: 200,
+          queryResult: user
         }
       });
-    return resultData;
+return resultData;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: null
+    };
   }
 }
 export async function deleteUserById(id: string) {
@@ -92,16 +112,24 @@ export async function deleteUserById(id: string) {
       .where("id", id)
       .del()
       .then(function (data) {
-        if (data === 0) {
-          return 400;
-        } else {
-          return 200;
+        if (!data) {
+          return {
+            modelResponseCode: 400,
+            queryResult: false
+          };
+        } 
+        return {
+          modelResponseCode: 200,
+          queryResult: true
         }
       });
-    return resultData;
+      return resultData;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: false
+    };
   }
 }
 export async function getRoleId(userId: string){
@@ -113,11 +141,11 @@ export async function getRoleId(userId: string){
       .then(function (data) {
         return data;
       });
-    if (resultData.length > 0) {
-      return [resultData[0].role_id];   
-    } else {
-      return [];
-    }
+      if(!resultData.length){
+        return [];
+      }
+      return [resultData[0].role_id];
+
   } catch (error) {
     console.log(error);
   }
@@ -132,12 +160,11 @@ export async function getAssignedPermissionsForRole(roleId: string){
       .then(function (data) {
         return data;
       });
-    if (resultData.length > 0) {
+      if(!resultData.length){
+        return [];
+      }
       return [resultData[0].permissions];
-      
-    } else {
-      return [];
-    }
+   
   } catch (error) {
     console.log(error);
   }

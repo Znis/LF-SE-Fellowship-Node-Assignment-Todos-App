@@ -13,7 +13,7 @@ export async function getTodos(userId: string) {
       .then(function (data) {
         return data;
       });
-    return resultData;
+      return resultData;
   } catch (error) {
     console.log(error);
   }
@@ -33,12 +33,18 @@ export async function createTodos(userId: string, todos: Itodos) {
       })
       .into("todos")
       .then(function () {
-        return 200;
+        return {
+          modelResponseCode: 200,
+          queryResult: todos
+        };
       });
-    return databaseInsert;
+return databaseInsert;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: null
+    };
   }
 }
 export async function updateTodosById(
@@ -59,16 +65,24 @@ export async function updateTodosById(
         user_id: userId,
       })
       .then(function (data) {
-        if (data === 1) {
-          return 200;
-        } else {
-          return 400;
+        if (!data) {
+          return {
+            modelResponseCode: 400,
+            queryResult: null
+          };
         }
+        return {
+          modelResponseCode: 200,
+          queryResult: todos
+        };
       });
-    return resultData;
+ return resultData;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: null
+    };;
   }
 }
 export async function deleteTodosById(userId: string, id: string) {
@@ -78,15 +92,23 @@ export async function deleteTodosById(userId: string, id: string) {
       .andWhere("user_id", userId)
       .del()
       .then(function (data) {
-        if (data === 0) {
-          return 400;
-        } else {
-          return 200;
-        }
+        if (!data) {
+          return {
+            modelResponseCode: 400,
+            queryResult: false
+          };
+        } 
+        return {
+          modelResponseCode: 200,
+          queryResult: true
+        };
       });
-    return resultData;
+return resultData;
   } catch (error) {
     console.log(error);
-    return 400;
+    return {
+      modelResponseCode: 400,
+      queryResult: false
+    };
   }
 }

@@ -1,7 +1,9 @@
+import HttpStatusCode from 'http-status-codes';
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import * as TodosService from "../services/todos";
 import todosSchema from "../schema/todos";
+import { SchemaError } from '../../error/schemaError';
 
 export async function getTodos(
   req: Request,
@@ -10,7 +12,7 @@ export async function getTodos(
 ) {
   const currUserId = req.user!.id;
   const data = await TodosService.getTodos(currUserId!);
-  return res.status(201).json(data);
+  res.status(HttpStatusCode.OK).json(data);
 }
 export async function createTodos(
   req: Request,
@@ -21,10 +23,12 @@ export async function createTodos(
   const data = req.body;
   const { error, value } = todosSchema.validate(data);
   if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+    next(new SchemaError("Input Data Invalid"));
+    return;
   }
   const response = await TodosService.createTodos(currUserId!, value);
-  return res.json(response);
+  res.status(HttpStatusCode.CREATED).json(response);
+
 }
 export async function updateTodos(
   req: Request,
@@ -37,10 +41,11 @@ export async function updateTodos(
   const data = req.body;
   const { error, value } = todosSchema.validate(data);
   if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+    next(new SchemaError("Input Data Invalid"));
+    return;
   }
   const response = await TodosService.updateTodos(currUserId!, id, value);
-  return res.json(response);
+  res.status(HttpStatusCode.OK).json(response);
 }
 export async function deleteTodos(
   req: Request,
@@ -49,6 +54,8 @@ export async function deleteTodos(
 ) {
   const currUserId = req.user!.id;
   const { id } = req.params;
-  const response = await TodosService.deleteTodos(currUserId!, id);
-  return res.json(response);
+  await TodosService.deleteTodos(currUserId!, id);
+
+  res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
+
 }
