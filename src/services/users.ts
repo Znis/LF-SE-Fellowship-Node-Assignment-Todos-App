@@ -6,6 +6,7 @@ import { ModelError } from "../error/modelError";
 import loggerWithNameSpace from "../utils/logger";
 
 const logger = loggerWithNameSpace("Users Service");
+const salt = 10;
 
 export async function getUserByEmail(email: string) {
   logger.info(`Getting User with email ${email} from Todos Model`);
@@ -15,7 +16,6 @@ export async function getUserByEmail(email: string) {
 
 export async function createUser(user: Iuser) {
   logger.info("Creating new user");
-  const salt = 10;
   const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
 
@@ -35,7 +35,6 @@ export async function createUser(user: Iuser) {
 
 export async function editUser(id: string, user: Iuser) {
   logger.info(`Editing user with id ${id}`);
-  const salt = 10;
   const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
   const { modelResponseCode, queryResult } = await UserModel.editUserById(
@@ -91,7 +90,7 @@ export async function getAssignedPermission(userId: string) {
   }
   const permissions = await getAssignedPermissionsForRole(roleId![0]);
   if (!permissions!.length) {
-    logger.error(`No any permission for user with userId ${userId}`)
+    logger.error(`No any permission for user with userId ${userId}`);
     return [];
   }
   return permissions![0];

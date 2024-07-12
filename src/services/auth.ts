@@ -27,7 +27,9 @@ export async function login(
     body.password,
     existingUser.password
   );
-  logger.info(`Checking if password is valid for the user with email ${body.email}`);
+  logger.info(
+    `Checking if password is valid for the user with email ${body.email}`
+  );
   if (!isValidPassword) {
     logger.error(`Password is not valid for the user with email ${body.email}`);
     throw new UnauthenticatedError("Invalid Credentials");
@@ -50,7 +52,9 @@ export async function refresh(
   res: Response,
   authorization: string | undefined
 ) {
-  logger.info("Checking for authorization header for regenerating access token");
+  logger.info(
+    "Checking for authorization header for regenerating access token"
+  );
   if (!authorization) {
     logger.error("Authorization header not found");
     throw new UnauthenticatedError("No Authorization Headers");

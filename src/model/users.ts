@@ -170,7 +170,9 @@ export async function getRoleId(userId: string) {
 
 export async function getAssignedPermissionsForRole(roleId: string) {
   try {
-    logger.info(`Querying database for assigned permissions of roleId ${roleId}`);
+    logger.info(
+      `Querying database for assigned permissions of roleId ${roleId}`
+    );
     const resultData = await knexInstance
       .select("permissions")
       .from("roles_permissions")

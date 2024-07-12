@@ -26,7 +26,6 @@ export async function getTodos(userId: string) {
 
 export async function createTodos(userId: string, todos: Itodos) {
   try {
-
     logger.info("Attempting to insert Todo in database");
     const databaseInsert = await knexInstance
       .insert({
@@ -65,11 +64,11 @@ export async function updateTodosById(
   try {
     logger.info("Atemmpting to verify Todo ownership");
     const ownership = await checkTodoOwnership(userId, id);
-    if(!ownership){
+    if (!ownership) {
       logger.error("Todo ownership could not be verified");
       return {
         modelResponseCode: 403,
-        queryResult: null
+        queryResult: null,
       };
     }
     logger.info("Todo ownership verified");
@@ -97,9 +96,8 @@ export async function updateTodosById(
           queryResult: todo,
         };
       });
-      logger.info("Updation of Todo in database completed");
-      return resultData;
- 
+    logger.info("Updation of Todo in database completed");
+    return resultData;
   } catch (error) {
     logger.error("Updation of Todo in database could not be completed");
     console.log(error);
@@ -113,13 +111,13 @@ export async function deleteTodosById(userId: string, id: string) {
   try {
     logger.info("Atemmpting to verify Todo ownership");
     const ownership = await checkTodoOwnership(userId, id);
-    if(!ownership){
+    if (!ownership) {
       logger.error("Todo ownership could not be verified");
       return {
         modelResponseCode: 403,
-        queryResult: null
+        queryResult: null,
       };
-    }    
+    }
     logger.info("Attempting to delete Todo from database");
     const resultData = await knexInstance("todos")
       .where("id", id)
@@ -151,17 +149,17 @@ export async function deleteTodosById(userId: string, id: string) {
 
 async function checkTodoOwnership(userId: string, id: string) {
   try {
-    const resultData = (await knexInstance
+    const resultData = await knexInstance
       .select("user_id")
       .from("todos")
       .where("id", id)
 
       .then(function (data) {
         return data;
-      }));
-      if(!resultData.length){
-        return false;
-      }
+      });
+    if (!resultData.length) {
+      return false;
+    }
     if (resultData[0].user_id == userId) {
       return true;
     }

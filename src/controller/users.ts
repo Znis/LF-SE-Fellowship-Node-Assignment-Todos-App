@@ -1,7 +1,6 @@
 import HttpStatusCode from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
 import * as UsersService from "../services/users";
-import { userSchema } from "../schema/user";
 import { SchemaError } from "../error/schemaError";
 import { BaseError } from "../error/baseError";
 import loggerWithNameSpace from "../utils/logger";
@@ -39,15 +38,10 @@ export async function createUser(
 ) {
   try {
     const data = req.body;
-    const { error, value } = userSchema.validate(data);
-    if (error) {
-      next(new SchemaError("Input Data Invalid"));
-      return;
-    }
     logger.info("Attempting to create new user");
-    const response = await UsersService.createUser(value);
+    const response = await UsersService.createUser(data);
     logger.info("New user created");
-    return res.status(HttpStatusCode.CREATED).json({created:response});
+    return res.status(HttpStatusCode.CREATED).json({ created: response });
   } catch (error) {
     logger.error("User creation failed");
     next(error);
@@ -61,15 +55,10 @@ export async function editUser(
   try {
     const { id } = req.params;
     const data = req.body;
-    const { error, value } = userSchema.validate(data);
-    if (error) {
-      next(new SchemaError("Input Data Invalid"));
-      return;
-    }
     logger.info(`Attempting to edit user with id ${id}`);
-    const response = await UsersService.editUser(id, value);
+    const response = await UsersService.editUser(id, data);
     logger.info(`User with id ${id} edited`);
-    return res.status(HttpStatusCode.OK).json({edited:response});
+    return res.status(HttpStatusCode.OK).json({ edited: response });
   } catch (error) {
     logger.error("User update failed");
     next(error);

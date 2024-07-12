@@ -2,7 +2,6 @@ import HttpStatusCode from "http-status-codes";
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import * as TodosService from "../services/todos";
-import todosSchema from "../schema/todos";
 import { SchemaError } from "../error/schemaError";
 import loggerWithNameSpace from "../utils/logger";
 
@@ -28,15 +27,10 @@ export async function createTodos(
   try {
     const currUserId = req.user!.id;
     const data = req.body;
-    const { error, value } = todosSchema.validate(data);
-    if (error) {
-      next(new SchemaError("Input Data Invalid"));
-      return;
-    }
     logger.info("Attempting to create new Todo");
-    const response = await TodosService.createTodos(currUserId!, value);
+    const response = await TodosService.createTodos(currUserId!, data);
     logger.info("Todos creation Successful");
-    return res.status(HttpStatusCode.CREATED).json({created:response});
+    return res.status(HttpStatusCode.CREATED).json({ created: response });
   } catch (error) {
     logger.error("Todos creation Failed");
     next(error);
@@ -52,15 +46,10 @@ export async function updateTodos(
 
     const { id } = req.params;
     const data = req.body;
-    const { error, value } = todosSchema.validate(data);
-    if (error) {
-      next(new SchemaError("Input Data Invalid"));
-      return;
-    }
     logger.info(`Attempting to edit Todo with id ${id}`);
-    const response = await TodosService.updateTodos(currUserId!, id, value);
+    const response = await TodosService.updateTodos(currUserId!, id, data);
     logger.info(`Todo with id ${id} updated successfully`);
-    return res.status(HttpStatusCode.OK).json({updated:response});
+    return res.status(HttpStatusCode.OK).json({ updated: response });
   } catch (error) {
     logger.error("Todo update failed");
     next(error);

@@ -32,7 +32,7 @@ export async function updateTodos(userId: string, id: string, data: Itodos) {
     id,
     data
   );
-  if(modelResponseCode == 403){
+  if (modelResponseCode == 403) {
     logger.error(`Todo with ${id} is not authorized for userId ${userId}`);
     throw new ForbiddenError("Forbidden");
   }
@@ -49,7 +49,7 @@ export async function deleteTodos(userId: string, id: string) {
     userId,
     id
   );
-  if(modelResponseCode == 403){
+  if (modelResponseCode == 403) {
     logger.error(`Todo with ${id} is not authorized for userId ${userId}`);
     throw new ForbiddenError("Forbidden");
   }

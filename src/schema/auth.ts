@@ -2,22 +2,7 @@ import joi from "joi";
 
 const minPasswordLength = 4;
 
-export const getUserByEmailBodySchema = joi
-  .object({
-    email: joi.string().email().required().messages({
-      "any.required": "Email is required",
-      "string.email": "Email must be valid format",
-    }),
-  })
-  .options({
-    stripUnknown: true,
-  });
-
-export const createOrEditUserBodySchema = joi.object({
-  name: joi.string().required().messages({
-    "any.required": "Name is required",
-  }),
-
+export const loginBodySchema = joi.object({
   email: joi.string().email().required().messages({
     "any.required": "Email is required",
     "string.email": "Email must be valid format",
@@ -53,13 +38,3 @@ export const createOrEditUserBodySchema = joi.object({
       stripUnknown: true,
     }),
 });
-
-export const editOrdeleteUserQuerySchema = joi
-  .object({
-    id: joi.number().required().messages({
-      "number.base": "id must be a number",
-    }),
-  })
-  .options({
-    stripUnknown: true,
-  });
