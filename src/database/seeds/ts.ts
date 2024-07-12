@@ -25,7 +25,7 @@ export async function seed(knex: Knex): Promise<void> {
     },
   ]);
 
-  const hashedPassword = await bcrypt.hash("admin", 10);
+  const hashedPassword = await bcrypt.hash("Admin$", 10);
 
   await knex("users").insert({
     name: "admin",
