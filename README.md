@@ -84,7 +84,7 @@ npm start
 ```
 OR,  
 
-Clone the repo and switch to branch assignment-3 and run the command.    
+Clone the repo and switch to branch assignment-4 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
 Run the following commands.
