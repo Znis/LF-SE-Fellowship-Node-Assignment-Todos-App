@@ -6,7 +6,7 @@ import loggerWithNameSpace from "../utils/logger";
 const knexInstance = knex(baseKnexConfig);
 const logger = loggerWithNameSpace("Users Model");
 
-export async function getUserByEmail(email: string) {
+async function getUserByEmail(email: string) {
   try {
     logger.info(`Querying database for user with email ${email}`);
     const resultData = (await knexInstance
@@ -28,7 +28,7 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function createUser(user: Iuser) {
+async function createUser(user: Iuser) {
   try {
     logger.info("Attempting to insert new user in the database");
     const databaseInsert = await knexInstance
@@ -56,7 +56,7 @@ export async function createUser(user: Iuser) {
   }
 }
 
-export async function assignRole(userId: string, role: string) {
+async function assignRole(userId: string, role: string) {
   try {
     logger.info("Attempting to assign role to the user");
     const databaseInsert = await knexInstance
@@ -82,7 +82,7 @@ export async function assignRole(userId: string, role: string) {
     };
   }
 }
-export async function editUserById(id: string, user: Iuser) {
+async function editUserById(id: string, user: Iuser) {
   try {
     logger.info(`Attempting to edit user with id ${id} in the database`);
     const resultData = await knexInstance("users")
@@ -116,7 +116,7 @@ export async function editUserById(id: string, user: Iuser) {
     };
   }
 }
-export async function deleteUserById(id: string) {
+async function deleteUserById(id: string) {
   try {
     logger.info(`Attempting to delete user with id ${id} in the database`);
     const resultData = await knexInstance("users")
@@ -146,7 +146,7 @@ export async function deleteUserById(id: string) {
     };
   }
 }
-export async function getRoleId(userId: string) {
+async function getRoleId(userId: string) {
   try {
     logger.info(`Querying database for roleId of userId ${userId}`);
     const resultData = await knexInstance
@@ -168,7 +168,7 @@ export async function getRoleId(userId: string) {
   }
 }
 
-export async function getAssignedPermissionsForRole(roleId: string) {
+async function getAssignedPermissionsForRole(roleId: string) {
   try {
     logger.info(
       `Querying database for assigned permissions of roleId ${roleId}`
@@ -191,3 +191,12 @@ export async function getAssignedPermissionsForRole(roleId: string) {
     console.log(error);
   }
 }
+export default {
+  getUserByEmail,
+  getAssignedPermissionsForRole,
+  getRoleId,
+  deleteUserById,
+  createUser,
+  editUserById,
+  assignRole
+  }

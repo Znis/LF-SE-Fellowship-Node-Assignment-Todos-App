@@ -10,7 +10,7 @@ const salt = 10;
 
 export async function getUserByEmail(email: string) {
   logger.info(`Getting User with email ${email} from Todos Model`);
-  const data = await UserModel.getUserByEmail(email);
+  const data = await UserModel.default.getUserByEmail(email);
   return data;
 }
 
@@ -19,7 +19,7 @@ export async function createUser(user: Iuser) {
   const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
 
-  const createUserResponse = await UserModel.createUser(user);
+  const createUserResponse = await UserModel.default.createUser(user);
   if (createUserResponse.modelResponseCode != 200) {
     logger.error("Could not create new user");
     throw new ModelError("Could not create User");
@@ -37,7 +37,7 @@ export async function editUser(id: string, user: Iuser) {
   logger.info(`Editing user with id ${id}`);
   const hashedPassword = await bcrypt.hash(user.password, salt);
   user.password = hashedPassword;
-  const { modelResponseCode, queryResult } = await UserModel.editUserById(
+  const { modelResponseCode, queryResult } = await UserModel.default.editUserById(
     id,
     user
   );
@@ -50,7 +50,7 @@ export async function editUser(id: string, user: Iuser) {
 
 export async function deleteUser(id: string) {
   logger.info(`Deleting user with id ${id}`);
-  const { modelResponseCode, queryResult } = await UserModel.deleteUserById(id);
+  const { modelResponseCode, queryResult } = await UserModel.default.deleteUserById(id);
   if (modelResponseCode != 200) {
     logger.error(`Could not delete user with id ${id}`);
     throw new ModelError("Could not delete User");
@@ -60,7 +60,7 @@ export async function deleteUser(id: string) {
 
 export async function assignRole(userId: string, role: string) {
   logger.info(`Assigning role to the user with id ${userId}`);
-  const { modelResponseCode, queryResult } = await UserModel.assignRole(
+  const { modelResponseCode, queryResult } = await UserModel.default.assignRole(
     userId,
     role
   );
@@ -72,12 +72,12 @@ export async function assignRole(userId: string, role: string) {
 }
 
 async function getRoleId(userId: string) {
-  const data = await UserModel.getRoleId(userId);
+  const data = await UserModel.default.getRoleId(userId);
   return data;
 }
 
 async function getAssignedPermissionsForRole(roleId: string) {
-  const data = await UserModel.getAssignedPermissionsForRole(roleId);
+  const data = await UserModel.default.getAssignedPermissionsForRole(roleId);
   return data;
 }
 
@@ -95,3 +95,4 @@ export async function getAssignedPermission(userId: string) {
   }
   return permissions![0];
 }
+
