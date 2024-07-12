@@ -7,33 +7,36 @@ import {
   editUser,
   getUserByEmail,
 } from "../controller/users";
-import { authorize } from "../middleware/auth";
+import { auth, authorize } from "../middleware/auth";
 import { validateReqBody, validateReqQuery } from "../middleware/validator";
 import { editOrdeleteUserQuerySchema } from "../schema/user";
 
 const usersRouter = express();
 
-usersRouter.post("/", getUserByEmail);
+usersRouter.post("/", auth, getUserByEmail);
 
 usersRouter.post(
   "/register",
-  authorize(permissions.create_user),
-  validateReqQuery(editOrdeleteUserQuerySchema),
   validateReqBody(createOrEditUserBodySchema),
+  auth,
+  authorize(permissions.create_user),
   createUser
 );
 
 usersRouter.put(
   "/edit/:id",
-  authorize(permissions.edit_user),
+  validateReqQuery(editOrdeleteUserQuerySchema),
   validateReqBody(createOrEditUserBodySchema),
+  auth,
+  authorize(permissions.edit_user),
   editUser
 );
 
 usersRouter.delete(
   "/delete/:id",
-  authorize(permissions.delete_user),
   validateReqQuery(editOrdeleteUserQuerySchema),
+  auth,
+  authorize(permissions.delete_user),
   deleteUser
 );
 export default usersRouter;

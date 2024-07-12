@@ -5,7 +5,7 @@ import {
   getTodos,
   updateTodos,
 } from "../controller/todos";
-import { authorize } from "../middleware/auth";
+import { auth, authorize } from "../middleware/auth";
 import { permissions } from "../enums/users";
 import { validateReqBody, validateReqQuery } from "../middleware/validator";
 import {
@@ -15,27 +15,30 @@ import {
 
 const todosRouter = express();
 
-todosRouter.post("/", authorize(permissions.view_todo), getTodos);
+todosRouter.post("/", auth, authorize(permissions.view_todo), getTodos);
 
 todosRouter.post(
   "/create",
-  authorize(permissions.create_todo),
   validateReqBody(createOrUpdateTodoBodySchema),
+  auth,
+  authorize(permissions.create_todo),
   createTodos
 );
 
 todosRouter.put(
   "/update/:id",
-  authorize(permissions.update_todo),
   validateReqQuery(updateOrdeleteTodoQuerySchema),
   validateReqBody(createOrUpdateTodoBodySchema),
+  auth,
+  authorize(permissions.update_todo),
   updateTodos
 );
 
 todosRouter.delete(
   "/delete/:id",
-  authorize(permissions.delete_todo),
   validateReqQuery(updateOrdeleteTodoQuerySchema),
+  auth,
+  authorize(permissions.delete_todo),
   deleteTodos
 );
 

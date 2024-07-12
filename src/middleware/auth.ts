@@ -7,6 +7,7 @@ import Iuser from "../interfaces/user";
 import { getAssignedPermission } from "../services/auth";
 import { ForbiddenError } from "../error/forbiddenError";
 import loggerWithNameSpace from "../utils/logger";
+import { ModelError } from "../error/modelError";
 
 const logger = loggerWithNameSpace("Auth Middleware");
 
@@ -44,6 +45,7 @@ export function auth(req: Request, res: Response, next: NextFunction) {
 
 export function authorize(permission: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
+    try{
     const user = req.user!;
     logger.info("Checking for the permission");
     const permissions = await getAssignedPermission(user.id!);
@@ -54,5 +56,9 @@ export function authorize(permission: string) {
     }
     logger.info("Operation permitted");
     next();
+  }catch{
+    logger.error("Permission Checking failed");
+    next(new ModelError("Permission retrieval error"));
+  }
   };
 }
