@@ -1,23 +1,17 @@
-import HttpStatusCode from "http-status-codes";
 import jwt, { sign } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import Iuser from "../interfaces/user";
 import config from "../config";
-import { getUserByEmail } from "./users";
-import { Request, Response } from "express";
-import { getAssignedPermission as getAssignedPermissionFromUserService } from "./users";
 import { UnauthenticatedError } from "../error/unauthenticatedError";
 import loggerWithNameSpace from "../utils/logger";
+import UserServices from "./users";
 
+export const userServices = new UserServices();
 const logger = loggerWithNameSpace("Auth Services");
 
-export async function login(
-  req: Request,
-  res: Response,
-  body: Pick<Iuser, "email" | "password">
-) {
+export async function login(body: Pick<Iuser, "email" | "password">) {
   logger.info(`Checking for existing user with email ${body.email}`);
-  const existingUser = await getUserByEmail(body.email);
+  const existingUser = await userServices.getUserByEmail(body.email);
 
   if (!existingUser) {
     logger.error(`User with email ${body.email} not found`);
@@ -47,11 +41,7 @@ export async function login(
   return { accessToken: accessToken, refreshToken: refreshToken };
 }
 
-export async function refresh(
-  req: Request,
-  res: Response,
-  authorization: string | undefined
-) {
+export async function refresh(authorization: string | undefined) {
   logger.info(
     "Checking for authorization header for regenerating access token"
   );
@@ -69,16 +59,22 @@ export async function refresh(
   try {
     logger.info("Checking if refresh token is valid");
     const verifiedData = jwt.verify(token[1], config.jwt.secret!) as Iuser;
-    if (verifiedData) {
-      const accessToken = sign(verifiedData, config.jwt.secret!, {
-        expiresIn: config.jwt.accessTokenExpiry,
-      });
-      logger.info("Refresh token validated");
-      return accessToken;
-    } else {
+
+    if (!verifiedData) {
       logger.error("Refresh token invalid");
       throw new UnauthenticatedError("Invalid Token");
     }
+    const payload = {
+      id: verifiedData.id,
+      name: verifiedData.name,
+      email: verifiedData.email,
+    };
+    const accessToken = sign(payload, config.jwt.secret!, {
+      expiresIn: config.jwt.accessTokenExpiry,
+    });
+
+    logger.info("Refresh token validated");
+    return accessToken;
   } catch {
     logger.error("Refresh token could not be verified");
     throw new UnauthenticatedError("Token Verification Error");
@@ -87,6 +83,6 @@ export async function refresh(
 
 export async function getAssignedPermission(userId: string) {
   logger.info(`Getting assigned permissions for user with userId ${userId}`);
-  const permissions = await getAssignedPermissionFromUserService(userId);
+  const permissions = await userServices.getAssignedPermission(userId);
   return permissions;
 }

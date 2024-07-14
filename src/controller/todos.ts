@@ -2,7 +2,6 @@ import HttpStatusCode from "http-status-codes";
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import * as TodosService from "../services/todos";
-import { SchemaError } from "../error/schemaError";
 import loggerWithNameSpace from "../utils/logger";
 
 const logger = loggerWithNameSpace("Todos Controller");
@@ -12,11 +11,16 @@ export async function getTodos(
   res: Response,
   next: NextFunction
 ) {
-  const currUserId = req.user!.id;
-  logger.info("Attempting to get Todos");
-  const data = await TodosService.getTodos(currUserId!);
-  logger.info("Todos retrieval Successful");
-  return res.status(HttpStatusCode.OK).json(data);
+  try {
+    const currUserId = req.user!.id;
+    logger.info("Attempting to get Todos");
+    const data = await TodosService.getTodos(currUserId!);
+    logger.info("Todos retrieval Successful");
+    return res.status(HttpStatusCode.OK).json(data);
+  } catch (error) {
+    logger.error("Todos fetch Failed");
+    next(error);
+  }
 }
 
 export async function createTodos(

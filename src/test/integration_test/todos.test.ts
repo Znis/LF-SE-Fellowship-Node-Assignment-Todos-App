@@ -8,20 +8,22 @@ import {
   notFoundError,
 } from "../../middleware/errorHandler";
 
-describe("User Integration Test Suite", () => {
+describe("Todos Integration Test Suite", () => {
   const app = express();
   app.use(express.json());
   app.use(router);
 
   app.use(genericErrorHandler);
   app.use(notFoundError);
-
-  let user = {
-    name: "yo",
-    email: "yolo@yolo.com",
-    password: "Yoo$",
+  let todo = {
+    title: "dummyxyz",
+    description: "dummydummy",
+    dueDate: "2001-01-01",
+    completed: false,
+    priority: "Medium",
+    category: "Sports",
   };
-  describe("getUserByEmail API Test", () => {
+  describe("getTodos API Test", () => {
     let accessToken;
 
     beforeEach(async () => {
@@ -31,17 +33,16 @@ describe("User Integration Test Suite", () => {
       accessToken = response.body.accessToken;
     });
 
-    it("Should return the admin name", async () => {
+    it("Should return the todos of the user", async () => {
       const response = await request(app)
-        .post("/users/")
+        .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
-        .set("Content-Type", "application/json")
-        .send({ email: "admin@admin.com" });
+        .set("Content-Type", "application/json");
 
-      expect(response.body.name).toBe("admin");
+      expect(response.body).toStrictEqual([]);
     });
   });
-  describe("createUser API Test", () => {
+  describe("createTodo API Test", () => {
     let accessToken;
 
     beforeEach(async () => {
@@ -51,29 +52,28 @@ describe("User Integration Test Suite", () => {
       accessToken = response.body.accessToken;
     });
     afterEach(async () => {
-      const id = await request(app)
-        .post("/users/")
+      const todos = await request(app)
+        .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
-        .set("Content-Type", "application/json")
-        .send({ email: "yolo@yolo.com" });
-
+        .set("Content-Type", "application/json");
+      const todo = todos.body.find((todo) => todo.title === "dummyxyz");
       await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/todos/delete/${todo.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
 
-    it("Should create new user", async () => {
+    it("Should create new todo", async () => {
       const response = await request(app)
-        .post("/users/register")
+        .post("/todos/create")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
-        .send(user);
+        .send(todo);
 
-      expect(response.body.created.email).toBe("yolo@yolo.com");
+      expect(response.body.created.title).toBe("dummyxyz");
     });
   });
-  describe("editUser API Test", () => {
+  describe("editTodos API Test", () => {
     let accessToken;
     let id;
 
@@ -83,34 +83,34 @@ describe("User Integration Test Suite", () => {
         .send({ email: "admin@admin.com", password: "Admin$" });
       accessToken = response.body.accessToken;
       await request(app)
-        .post("/users/register")
+        .post("/todos/create")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
-        .send(user);
-      id = await request(app)
-        .post("/users/")
+        .send(todo);
+      const todos = await request(app)
+        .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
-        .set("Content-Type", "application/json")
-        .send({ email: "yolo@yolo.com" });
+        .set("Content-Type", "application/json");
+      id = todos.body.find((todo) => todo.title === "dummyxyz").id;
     });
     afterEach(async () => {
       await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/todos/delete/${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
 
-    it("Should edit the user", async () => {
+    it("Should edit the todo", async () => {
       const response = await request(app)
-        .put(`/users/edit/${id.body.id}`)
+        .put(`/todos/update/${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
-        .send({ ...user, name: "YOLO" });
+        .send({ ...todo, title: "abcDummy" });
 
-      expect(response.body.edited.name).toBe("YOLO");
+      expect(response.body.updated.title).toBe("abcDummy");
     });
   });
-  describe("deleteUser API Test", () => {
+  describe("deleteTodos API Test", () => {
     let accessToken;
     let id;
 
@@ -120,20 +120,20 @@ describe("User Integration Test Suite", () => {
         .send({ email: "admin@admin.com", password: "Admin$" });
       accessToken = response.body.accessToken;
       await request(app)
-        .post("/users/register")
+        .post("/todos/create")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
-        .send(user);
-      id = await request(app)
-        .post("/users/")
+        .send(todo);
+      const todos = await request(app)
+        .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
-        .set("Content-Type", "application/json")
-        .send({ email: "yolo@yolo.com" });
+        .set("Content-Type", "application/json");
+      id = todos.body.find((todo) => todo.title === "dummyxyz").id;
     });
 
     it("Should delete the user", async () => {
       const response = await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/todos/delete/${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
 

@@ -2,7 +2,6 @@ import expect from "expect";
 import sinon from "sinon";
 import proxyquire from "proxyquire";
 import Itodos from "../../../interfaces/todos";
-import * as TodosModel from "../../../model/todos";
 
 describe("Todos Model Test Suite", () => {
   describe("getTodos", () => {
@@ -12,9 +11,13 @@ describe("Todos Model Test Suite", () => {
       where: sinon.stub().resolves([]),
     };
 
-    let { getTodos } = proxyquire.noCallThru()("../../../model/todos", {
-      knex: () => knexStub,
-    });
+    let { default: TodosModel } = proxyquire.noCallThru()(
+      "../../../model/todos",
+      {
+        knex: () => knexStub,
+      }
+    );
+    let todosModel = new TodosModel();
 
     afterEach(() => {
       sinon.restore();
@@ -24,7 +27,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.where.resolves([{ todoId: 1 }, { todoId: 2 }]);
       const userId = "1";
       const mResponse = [{ todoId: 1 }, { todoId: 2 }];
-      const result = await getTodos(userId);
+      const result = await todosModel.getTodos(userId);
 
       expect(result).toStrictEqual(mResponse);
     });
@@ -34,7 +37,7 @@ describe("Todos Model Test Suite", () => {
       const userId = "1";
       const mResponse = [];
 
-      const result = await getTodos(userId);
+      const result = await todosModel.getTodos(userId);
 
       expect(result).toStrictEqual(mResponse);
     });
@@ -43,7 +46,7 @@ describe("Todos Model Test Suite", () => {
       const error = new Error("Database error");
       knexStub.where.rejects(error);
       const userId = "1";
-      const result = await getTodos(userId);
+      const result = await todosModel.getTodos(userId);
 
       expect(result).toBe(null);
     });
@@ -63,10 +66,13 @@ describe("Todos Model Test Suite", () => {
     };
     const userId = "1";
 
-    let { createTodos } = proxyquire.noCallThru()("../../../model/todos", {
-      knex: () => knexStub,
-    });
-
+    let { default: TodosModel } = proxyquire.noCallThru()(
+      "../../../model/todos",
+      {
+        knex: () => knexStub,
+      }
+    );
+    let todosModel = new TodosModel();
     afterEach(() => {
       sinon.restore();
     });
@@ -74,8 +80,10 @@ describe("Todos Model Test Suite", () => {
     it("should insert a new user and return success response", async () => {
       const mResponse = { modelResponseCode: 200, queryResult: todo };
       knexStub.into.resolves(1);
-      const result = await createTodos(userId,todo);
-      expect(knexStub.insert.calledOnceWithExactly({...todo, user_id: userId})).toBeTruthy;
+      const result = await todosModel.createTodos(userId, todo);
+      expect(
+        knexStub.insert.calledOnceWithExactly({ ...todo, user_id: userId })
+      ).toBeTruthy;
       expect(result).toStrictEqual(mResponse);
     });
 
@@ -83,7 +91,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.into.rejects(new Error("Insertion error"));
       knexStub.into.resolves(0);
 
-      const result = await createTodos(userId,todo);
+      const result = await todosModel.createTodos(userId, todo);
 
       expect(result).toStrictEqual({
         modelResponseCode: 400,
@@ -91,149 +99,145 @@ describe("Todos Model Test Suite", () => {
       });
     });
   });
-//   describe("updateTodosById", () => {
+  describe("updateTodosById", () => {
+    let knexStub = {
+      update: sinon.stub().returnsThis(),
+      from: sinon.stub().returnsThis(),
+      where: sinon.stub().resolves(),
+    };
 
-//     let knexStub = {
-//       update: sinon.stub().returnsThis(),
-//       from: sinon.stub().returnsThis(),
-//       where: sinon.stub().resolves()
-//     };
-//     let checkTodoOwnershipStub = {
-//         select: sinon.stub().returnsThis(),
-//         from: sinon.stub().returnsThis(),
-//         where: sinon.stub().resolves()
-//       };
+    const todo: Itodos = {
+      title: "dummy",
+      description: "dummydummy",
+      dueDate: "2001-01-01",
+      completed: false,
+      priority: "Medium",
+      category: "Sports",
+    };
+    const userId = "1";
+    const id = "1";
 
+    let { default: TodosModel } = proxyquire.noCallThru()(
+      "../../../model/todos",
+      {
+        knex: () => knexStub,
+      }
+    );
+    let checkTodoOwnershipStub;
+    let todosModel;
+    beforeEach(() => {
+      todosModel = new TodosModel();
+      checkTodoOwnershipStub = sinon.stub(todosModel, "checkTodoOwnership");
+    });
 
+    afterEach(() => {
+      sinon.restore();
+      checkTodoOwnershipStub.restore();
+    });
+    it("should return 200 and updated todo object when update is successful", async () => {
+      checkTodoOwnershipStub.resolves(true);
+      knexStub.where.resolves(1);
 
+      const result = await todosModel.updateTodosById(userId, id, todo);
 
-//     const todo: Itodos = {
-//       title: "dummy",
-//       description: "dummydummy",
-//       dueDate: "2001-01-01",
-//       completed: false,
-//       priority: "Medium",
-//       category: "Sports",
-//     };
-//     const userId = "1";
-//     const id = "1";
+      expect(result).toStrictEqual({
+        modelResponseCode: 200,
+        queryResult: todo,
+      });
+    });
 
-//     let { updateTodosById } = proxyquire.noCallThru()("../../../model/todos", {
-//       knex: () => knexStub,
-//     });
+    it("should return 403 if todo ownership cannot be verified", async () => {
+      checkTodoOwnershipStub.resolves(false);
 
-//     afterEach(() => {
-//       sinon.restore();
-//     });
+      const result = await todosModel.updateTodosById(userId, id, todo);
 
-//     it("should return 403 if todo ownership cannot be verified", async () => {
-//         checkTodoOwnershipStub.where.resolves([]);
-    
-//         const result = await updateTodosById(userId, id, todo);
-    
-//         expect(result).toStrictEqual({
-//           modelResponseCode: 403,
-//           queryResult: null,
-//         });
-//       });
-    
-//       it("should return 200 and updated todo object when update is successful", async () => {
-//         checkTodoOwnershipStub.where.resolves([{userId: id}]);
-//         knexStub.where.resolves(1);
+      expect(result).toStrictEqual({
+        modelResponseCode: 403,
+        queryResult: null,
+      });
+    });
 
-    
-//         const result = await updateTodosById(userId, id, todo);
-    
-//         expect(knexStub.where.calledWith("id", id)).toBeTruthy;
-//         expect(knexStub.update.calledWith({
-//           title: todo.title,
-//           description: todo.description,
-//           completed: todo.completed,
-//           dueDate: todo.dueDate,
-//           priority: todo.priority,
-//           category: todo.category,
-//           user_id: userId,
-//         })).toBeTruthy;
-//         expect(result).toStrictEqual({
-//           modelResponseCode: 200,
-//           queryResult: todo,
-//         });
-//       });
-    
-//       it("should return 400 if update fails", async () => {
-//         checkTodoOwnershipStub.where.resolves([{userId: id}]);
-//         knexStub.where.resolves(0);
-    
-//         const result = await updateTodosById(userId, id, todo);
-    
-//         expect(knexStub.where.calledWith("id", id)).toBeTruthy;
-//         expect(knexStub.update.calledWith({
-//           title: todo.title,
-//           description: todo.description,
-//           completed: todo.completed,
-//           dueDate: todo.dueDate,
-//           priority: todo.priority,
-//           category: todo.category,
-//           user_id: userId,
-//         })).toBeTruthy;
-//         expect(result).toStrictEqual({
-//           modelResponseCode: 400,
-//           queryResult: null,
-//         });
-//       });
-    
-//       it("should return 400 if there is a database error", async () => {
-//         checkTodoOwnershipStub.where.resolves([{userId: id}]);
-//         knexStub.where.rejects(new Error("Database error"));
+    it("should return 400 if update fails", async () => {
+      checkTodoOwnershipStub.resolves(true);
+      knexStub.where.resolves(0);
 
-//         const result = await updateTodosById(userId, id, todo);
-    
-//         expect(knexStub.where.calledWith("id", id)).toBeTruthy;
-//         expect(knexStub.update.calledWith({
-//           title: todo.title,
-//           description: todo.description,
-//           completed: todo.completed,
-//           dueDate: todo.dueDate,
-//           priority: todo.priority,
-//           category: todo.category,
-//           user_id: userId,
-//         })).toBeTruthy;
-//         expect(result).toStrictEqual({
-//           modelResponseCode: 400,
-//           queryResult: null,
-//         });
-//       });
-//   });
-describe("checkTodoOwnership", () => {
+      const result = await todosModel.updateTodosById(userId, id, todo);
+
+      expect(knexStub.where.calledWith("id", id)).toBeTruthy;
+      expect(
+        knexStub.update.calledWith({
+          title: todo.title,
+          description: todo.description,
+          completed: todo.completed,
+          dueDate: todo.dueDate,
+          priority: todo.priority,
+          category: todo.category,
+          user_id: userId,
+        })
+      ).toBeTruthy;
+      expect(result).toStrictEqual({
+        modelResponseCode: 400,
+        queryResult: null,
+      });
+    });
+
+    it("should return 400 if there is a database error", async () => {
+      checkTodoOwnershipStub.resolves(true);
+      knexStub.where.rejects(new Error("Database error"));
+
+      const result = await todosModel.updateTodosById(userId, id, todo);
+
+      expect(knexStub.where.calledWith("id", id)).toBeTruthy;
+      expect(
+        knexStub.update.calledWith({
+          title: todo.title,
+          description: todo.description,
+          completed: todo.completed,
+          dueDate: todo.dueDate,
+          priority: todo.priority,
+          category: todo.category,
+          user_id: userId,
+        })
+      ).toBeTruthy;
+      expect(result).toStrictEqual({
+        modelResponseCode: 400,
+        queryResult: null,
+      });
+    });
+  });
+  describe("checkTodoOwnership", () => {
     let knexStub = {
       select: sinon.stub().returnsThis(),
       from: sinon.stub().returnsThis(),
       where: sinon.stub().resolves(),
     };
 
-    let { checkTodoOwnership } = proxyquire.noCallThru()("../../../model/todos", {
-      knex: () => knexStub,
-    });
-
+    let { default: TodosModel } = proxyquire.noCallThru()(
+      "../../../model/todos",
+      {
+        knex: () => knexStub,
+      }
+    );
+    let todosModel = new TodosModel();
     afterEach(() => {
       sinon.restore();
     });
 
     it("should return true if todo belongs to the userId", async () => {
-      knexStub.where.resolves([{user_id: 1}]);
+      knexStub.where.resolves([{ user_id: 1 }]);
       const userId = "1";
       const id = "1";
-      const result = await checkTodoOwnership(userId, id);
+      const result = await todosModel.checkTodoOwnership(userId, id);
 
       expect(result).toStrictEqual(true);
     });
 
     it("should return false if todo does not belong to the userId", async () => {
-      knexStub.where.resolves([{user_id: 2}]);
+      knexStub.where.resolves([{ user_id: 2 }]);
       const userId = "1";
       const id = "1";
 
-      const result = await checkTodoOwnership(userId,id);
+      const result = await todosModel.checkTodoOwnership(userId, id);
 
       expect(result).toStrictEqual(false);
     });
@@ -243,7 +247,7 @@ describe("checkTodoOwnership", () => {
       knexStub.where.rejects(error);
       const userId = "1";
       const id = "1";
-      const result = await checkTodoOwnership(userId, id);
+      const result = await todosModel.checkTodoOwnership(userId, id);
 
       expect(result).toBe(false);
     });

@@ -9,7 +9,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = req;
     logger.info("Attempting to login");
-    const authResponse = await AuthService.login(req, res, body);
+    const authResponse = await AuthService.login(body);
     logger.info("Login Successful");
     return res.status(HttpStatusCode.OK).json(authResponse);
   } catch (error) {
@@ -23,7 +23,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
     const { authorization } = req.headers;
     logger.info("Attempting to generate new access token");
-    const authResponse = await AuthService.refresh(req, res, authorization);
+    const authResponse = await AuthService.refresh(authorization);
     logger.info("New access token generated");
     return res.status(HttpStatusCode.OK).json(authResponse);
   } catch (error) {

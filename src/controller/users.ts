@@ -1,10 +1,10 @@
 import HttpStatusCode from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
-import * as UsersService from "../services/users";
-import { SchemaError } from "../error/schemaError";
+import UserService from "../services/users";
 import { BaseError } from "../error/baseError";
 import loggerWithNameSpace from "../utils/logger";
 
+export const userServices = new UserService();
 const logger = loggerWithNameSpace("Users Controller");
 
 export async function getUserByEmail(
@@ -16,7 +16,7 @@ export async function getUserByEmail(
     const body = req.body;
 
     logger.info(`Attempting to fetch user data with email ${body.email}`);
-    const data = await UsersService.getUserByEmail(body.email);
+    const data = await userServices.getUserByEmail(body.email);
     if (!data) {
       logger.error(`No user found with email ${body.email}`);
       next(new BaseError("No User Found"));
@@ -24,7 +24,7 @@ export async function getUserByEmail(
     }
     logger.info(`User with email ${body.email} found`);
     const { password, ...otherData } = data!;
-    return res.status(HttpStatusCode.OK).json({ otherData });
+    return res.status(HttpStatusCode.OK).json(otherData);
   } catch (error) {
     logger.error("User fetch failed");
     next(error);
@@ -39,7 +39,7 @@ export async function createUser(
   try {
     const data = req.body;
     logger.info("Attempting to create new user");
-    const response = await UsersService.createUser(data);
+    const response = await userServices.createUser(data);
     logger.info("New user created");
     return res.status(HttpStatusCode.CREATED).json({ created: response });
   } catch (error) {
@@ -56,7 +56,7 @@ export async function editUser(
     const { id } = req.params;
     const data = req.body;
     logger.info(`Attempting to edit user with id ${id}`);
-    const response = await UsersService.editUser(id, data);
+    const response = await userServices.editUser(id, data);
     logger.info(`User with id ${id} edited`);
     return res.status(HttpStatusCode.OK).json({ edited: response });
   } catch (error) {
@@ -72,7 +72,7 @@ export async function deleteUser(
   try {
     const { id } = req.params;
     logger.info(`Attempting to delete user with id ${id}`);
-    await UsersService.deleteUser(id);
+    await userServices.deleteUser(id);
     logger.info(`User with id ${id} deleted`);
     return res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
   } catch (error) {

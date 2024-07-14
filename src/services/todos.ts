@@ -1,20 +1,21 @@
 import Itodos from "../interfaces/todos";
-import * as TodosModel from "../model/todos";
 import { ModelError } from "../error/modelError";
 import { ForbiddenError } from "../error/forbiddenError";
 import loggerWithNameSpace from "../utils/logger";
+import TodosModel from "../model/todos";
 
+export const todosModel = new TodosModel();
 const logger = loggerWithNameSpace("Todos Service");
 
 export async function getTodos(userId: string) {
   logger.info("Getting Todos from Todos Model");
-  const data = await TodosModel.getTodos(userId);
+  const data = await todosModel.getTodos(userId);
   return data;
 }
 
 export async function createTodos(userId: string, data: Itodos) {
   logger.info(`Creating Todo for userId ${userId}`);
-  const { modelResponseCode, queryResult } = await TodosModel.createTodos(
+  const { modelResponseCode, queryResult } = await todosModel.createTodos(
     userId,
     data
   );
@@ -27,7 +28,7 @@ export async function createTodos(userId: string, data: Itodos) {
 
 export async function updateTodos(userId: string, id: string, data: Itodos) {
   logger.info(`Updating Todo with id ${id} for userId ${userId}`);
-  const { modelResponseCode, queryResult } = await TodosModel.updateTodosById(
+  const { modelResponseCode, queryResult } = await todosModel.updateTodosById(
     userId,
     id,
     data
@@ -45,7 +46,7 @@ export async function updateTodos(userId: string, id: string, data: Itodos) {
 
 export async function deleteTodos(userId: string, id: string) {
   logger.info(`Deleting Todo with id ${id} for userId ${userId}`);
-  const { modelResponseCode, queryResult } = await TodosModel.deleteTodosById(
+  const { modelResponseCode, queryResult } = await todosModel.deleteTodosById(
     userId,
     id
   );
