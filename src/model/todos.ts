@@ -12,15 +12,14 @@ export async function getTodos(userId: string) {
     const resultData = await knexInstance
       .select("*")
       .from("todos")
-      .where("user_id", userId)
-      .then(function (data) {
-        return data;
-      });
+      .where("user_id", userId);
+
     logger.info("Query to get Todos completed");
     return resultData;
   } catch (error) {
     logger.error("Query to get Todos could not be completed");
     console.log(error);
+    return null;
   }
 }
 
@@ -37,16 +36,20 @@ export async function createTodos(userId: string, todos: Itodos) {
         category: todos.category,
         user_id: userId,
       })
-      .into("todos")
-      .then(function () {
-        return {
-          modelResponseCode: 200,
-          queryResult: todos,
-        };
-      });
+      .into("todos");
+
+    if (!databaseInsert) {
+      return {
+        modelResponseCode: 400,
+        queryResult: null,
+      };
+    }
 
     logger.info("Insertion of Todo in database completed");
-    return databaseInsert;
+    return {
+      modelResponseCode: 200,
+      queryResult: todos,
+    };
   } catch (error) {
     logger.error("Insertion of Todo in database could not be completed");
     console.log(error);
@@ -73,8 +76,7 @@ export async function updateTodosById(
     }
     logger.info("Todo ownership verified");
     logger.info("Attempting to update Todo in database");
-    const resultData = await knexInstance("todos")
-      .where("id", id)
+    const resultData = await knexInstance
       .update({
         title: todo.title,
         description: todo.description,
@@ -84,20 +86,20 @@ export async function updateTodosById(
         category: todo.category,
         user_id: userId,
       })
-      .then(function (data) {
-        if (!data) {
-          return {
-            modelResponseCode: 400,
-            queryResult: null,
-          };
-        }
-        return {
-          modelResponseCode: 200,
-          queryResult: todo,
-        };
-      });
+      .from("todos")
+      .where("id", id);
+    if (!resultData) {
+      return {
+        modelResponseCode: 400,
+        queryResult: null,
+      };
+    }
+
     logger.info("Updation of Todo in database completed");
-    return resultData;
+    return {
+      modelResponseCode: 200,
+      queryResult: todo,
+    };
   } catch (error) {
     logger.error("Updation of Todo in database could not be completed");
     console.log(error);
@@ -147,16 +149,13 @@ export async function deleteTodosById(userId: string, id: string) {
   }
 }
 
-async function checkTodoOwnership(userId: string, id: string) {
+export async function checkTodoOwnership(userId: string, id: string) {
   try {
     const resultData = await knexInstance
       .select("user_id")
       .from("todos")
-      .where("id", id)
+      .where("id", id);
 
-      .then(function (data) {
-        return data;
-      });
     if (!resultData.length) {
       return false;
     }
@@ -166,5 +165,6 @@ async function checkTodoOwnership(userId: string, id: string) {
     return false;
   } catch (error) {
     console.log(error);
+    return false;
   }
 }

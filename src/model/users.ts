@@ -6,17 +6,15 @@ import loggerWithNameSpace from "../utils/logger";
 const knexInstance = knex(baseKnexConfig);
 const logger = loggerWithNameSpace("Users Model");
 
-async function getUserByEmail(email: string) {
+export async function getUserByEmail(email: string) {
   try {
     logger.info(`Querying database for user with email ${email}`);
-    const resultData = (await knexInstance
+    const resultData = await knexInstance
       .select("*")
       .from("users")
-      .where("email", email)
-      .then(function (data) {
-        return data;
-      })) as Iuser[];
-    if (!resultData.length) {
+      .where("email", email);
+
+    if (!resultData || !resultData.length) {
       logger.error(`User with email ${email} not found`);
       return null;
     }
@@ -24,11 +22,12 @@ async function getUserByEmail(email: string) {
     return resultData[0];
   } catch (error) {
     logger.error("Query could not be completed");
-    console.log(error);
+    return null;
+    
   }
 }
 
-async function createUser(user: Iuser) {
+export async function createUser(user: Iuser) {
   try {
     logger.info("Attempting to insert new user in the database");
     const databaseInsert = await knexInstance
@@ -37,18 +36,20 @@ async function createUser(user: Iuser) {
         email: user.email,
         password: user.password,
       })
-      .into("users")
-      .then(function () {
-        return {
-          modelResponseCode: 200,
-          queryResult: user,
-        };
-      });
+      .into("users");
+    if(!databaseInsert){
+      return {
+        modelResponseCode: 400,
+        queryResult: null,
+      };
+    }
     logger.info("Insertion of new user in database completed");
-    return databaseInsert;
+    return {
+      modelResponseCode: 200,
+      queryResult: user,
+    };
   } catch (error) {
     logger.error("Insertion of new user in database could not be completed");
-    console.log(error);
     return {
       modelResponseCode: 400,
       queryResult: null,
@@ -56,16 +57,20 @@ async function createUser(user: Iuser) {
   }
 }
 
-async function assignRole(userId: string, role: string) {
+export async function assignRole(userId: string, role: string) {
   try {
     logger.info("Attempting to assign role to the user");
+    const data = {
+      user_id: userId,
+      role_id: role,
+    }
     const databaseInsert = await knexInstance
       .insert({
         user_id: userId,
         role_id: role,
       })
       .into("users_roles")
-      .then(function (data) {
+      .then(function () {
         return {
           modelResponseCode: 200,
           queryResult: data,
@@ -75,24 +80,24 @@ async function assignRole(userId: string, role: string) {
     return databaseInsert;
   } catch (error) {
     logger.error("Assigning role could not be completed");
-    console.log(error);
     return {
       modelResponseCode: 400,
       queryResult: null,
     };
   }
 }
-async function editUserById(id: string, user: Iuser) {
+export async function editUserById(id: string, user: Iuser) {
   try {
     logger.info(`Attempting to edit user with id ${id} in the database`);
-    const resultData = await knexInstance("users")
-      .where("id", id)
-      .update({
-        name: user.name,
-        email: user.email,
-        password: user.password,
-      })
-      .then(function (data) {
+    const resultData = await knexInstance
+    .update({
+      name: user.name,
+      email: user.email,
+      password: user.password,
+    })  
+    .from("users")
+    .where("id", id)
+    .then((data) => {
         if (!data) {
           logger.error(`Editing user with id ${id} failed`);
           return {
@@ -109,66 +114,61 @@ async function editUserById(id: string, user: Iuser) {
     return resultData;
   } catch (error) {
     logger.error(`Editing user with id ${id} could not be completed`);
-    console.log(error);
     return {
       modelResponseCode: 400,
       queryResult: null,
     };
   }
 }
-async function deleteUserById(id: string) {
+export async function deleteUserById(id: string) {
   try {
     logger.info(`Attempting to delete user with id ${id} in the database`);
-    const resultData = await knexInstance("users")
-      .where("id", id)
+    const resultData = await knexInstance
       .del()
-      .then(function (data) {
-        if (!data) {
-          logger.error(`Deleting user with id ${id} failed`);
-          return {
-            modelResponseCode: 400,
-            queryResult: false,
-          };
-        }
-        logger.info(`Deleted user with id ${id} completed`);
+      .from("users")
+      .where("id", id);
+
+      if (!resultData) {
+        logger.error(`Deleting user with id ${id} failed`);
         return {
-          modelResponseCode: 200,
-          queryResult: true,
+          modelResponseCode: 400,
+          queryResult: false,
         };
-      });
-    return resultData;
+      }
+      logger.info(`Deleted user with id ${id} completed`);
+      return {
+        modelResponseCode: 200,
+        queryResult: true,
+      };
   } catch (error) {
     logger.error(`Deleting user with id ${id} could not be completed`);
-    console.log(error);
     return {
       modelResponseCode: 400,
       queryResult: false,
     };
   }
 }
-async function getRoleId(userId: string) {
+export async function getRoleId(userId: string) {
   try {
     logger.info(`Querying database for roleId of userId ${userId}`);
     const resultData = await knexInstance
       .select("role_id")
       .from("users_roles")
-      .where("user_id", userId)
-      .then(function (data) {
-        return data;
-      });
+      .where("user_id", userId);
+  
     if (!resultData.length) {
       logger.error(`roleId of userId ${userId} not found`);
-      return [];
+      return null;
     }
     logger.error(`roleId of userId ${userId} found`);
-    return [resultData[0].role_id];
+    return resultData[0].role_id;
   } catch (error) {
     logger.error("Query could not be completed");
-    console.log(error);
+    return null;
   }
 }
 
-async function getAssignedPermissionsForRole(roleId: string) {
+export async function getAssignedPermissionsForRole(roleId: string) {
   try {
     logger.info(
       `Querying database for assigned permissions of roleId ${roleId}`
@@ -176,27 +176,16 @@ async function getAssignedPermissionsForRole(roleId: string) {
     const resultData = await knexInstance
       .select("permissions")
       .from("roles_permissions")
-      .where("id", roleId)
-      .then(function (data) {
-        return data;
-      });
+      .where("id", roleId);
+
     if (!resultData.length) {
       logger.error(`Assigned permissions for roleId ${roleId} not found`);
-      return [];
+      return null;
     }
     logger.info(`Assigned permissions for roleId ${roleId} found`);
-    return [resultData[0].permissions];
+    return resultData[0].permissions;
   } catch (error) {
     logger.error("Query could not be completed");
-    console.log(error);
+    return null;
   }
 }
-export default {
-  getUserByEmail,
-  getAssignedPermissionsForRole,
-  getRoleId,
-  deleteUserById,
-  createUser,
-  editUserById,
-  assignRole
-  }
