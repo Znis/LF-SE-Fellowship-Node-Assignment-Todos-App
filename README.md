@@ -17,7 +17,11 @@ The app can be run on docker with docker-compose command.
 
 - __assignment-4__  
 It extends the feature of assignment-3 with Input Schema Validation.   
-Following are the usage routes for the API: 
+
+- __assignment-5__   
+It extend the assignment-4 branch with unit testing and integration testing.  
+
+  Following are the usage routes for the API: 
    - Todos  
 POST /todos/ -> fetch all the todos.  
 POST /todos/create -> Create the new todo.  
@@ -34,22 +38,31 @@ DELETE /users/delete/:id -> Delete the existing user.
 POST /auth/login -> Login with email and password and get the tokens.  
 POST /auth/refresh-> Create the new access token with refresh token.
 
-After initializing the API, the database is seeded with a few data in Users table (admin account) and in roles_permissions table with roles (admin and user) and their respective permissions. Check the seeder file in database/seeds directory. The default admin account credentials are:  
+  After initializing the API, the database is seeded with a few data in Users table (admin account) and in roles_permissions table with roles (admin and user) and their respective permissions. Check the seeder file in database/seeds directory. The default admin account credentials are:  
 
-     email: admin@admin.com  
-     password: Admin$
+       email: admin@admin.com  
+       password: Admin$
  
 
 
-The app can be run on docker with docker-compose command. 
-Clone the repo and switch to branch assignment-4 and run the command.    
+  The app can be run on docker with docker-compose command. 
+Clone the repo and switch to branch assignment-5 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
-Run the following commands.
-```bash
-docker-compose up
-```
+  Run the following commands.
+   ```bash
+  docker-compose up
+  ```
 
+  Unit testing can be performed by the following command.  
+  ```bash
+  npm test
+  ```
+
+  Integration testing can be performed by the following command.  
+  ```bash
+  npm run test:integration
+  ```  
 
 - __backend__  
 It contains the API or node server that handles the CRUD operation of the Todo app as well as user authentication too with JWT tokens.  
@@ -84,10 +97,11 @@ npm start
 ```
 OR,  
 
-Clone the repo and switch to branch assignment-4 and run the command.    
+Clone the repo and switch to branch assignment-5 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
 Run the following commands.
 ```bash
 docker-compose up
 ```
+
