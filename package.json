@@ -142,11 +142,11 @@
     "test:integration": "mocha --require ts-node/register src/test/integration_test/*.test.ts",
     "start": "nodemon src/index.ts",
     "knex": "knex --knexfile=src/knexFile.ts",
-    "make:migration": "npm run knex migrate:make -x ts --env development",
+    "make:migration": "npm run knex migrate:make --verbose",
     "migrate": "npm run knex migrate:latest --verbose",
     "rollback": "npm run knex migrate:rollback --verbose",
     "seed": "npm run knex seed:run --verbose",
-    "make:seeder": "npm run knex seed:make -x ts --env development"
+    "make:seeder": "npm run knex seed:make --verbose"
   },
   "author": "",
   "license": "ISC",

@@ -41,6 +41,7 @@ export function genericErrorHandler(
       .status(HttpStatusCode.BAD_REQUEST)
       .json({ message: error.message });
   }
+  
   if (error instanceof ModelError) {
     logger.error("Model response error");
     return res
@@ -56,6 +57,6 @@ export function genericErrorHandler(
 
   logger.error(error.message);
   return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-    message: error.message,
+    message: "INTERNAL SERVER ERROR",
   });
 }

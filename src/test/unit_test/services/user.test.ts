@@ -83,13 +83,9 @@ describe("User Service Test Suite", () => {
         queryResult: { ...user, password: "hashedPassword" },
       });
       assignRoleStub = sinon.stub(userServices, "assignRole").resolves();
-      // expect(bcryptHashStub.calledWith(user.password, sinon.match.any)).toBe(
-      //   true
-      // );
-      // expect(userModelCreateUserStub.callCount).toBe(1);
-      // expect(getUserByEmailStub.calledOnceWith(user.email)).toBe(true);
 
       const result = await userServices.createUser(user);
+      expect(userModelCreateUserStub.callCount).toBe(1);
       expect(result).toStrictEqual({ ...user, password: "hashedPassword" });
     });
     it("should throw an error if createUser response code is not 200", async () => {

@@ -115,38 +115,38 @@ describe("Auth Service Test Suite", () => {
         expect(err.message).toBe("No Bearer Token");
       }
     });
-    // it("should throw an error if refresh token is not valid", async () => {
-    //   verifyStub.resolves(undefined);
+    it("should throw an error if refresh token is not valid", async () => {
+      verifyStub.returns(undefined);
 
-    //   const authHeader = "Bearer refreshToken";
-    //   try {
-    //     await AuthService.refresh(authHeader);
-    //     throw new Error("Expected method to throw");
-    //   } catch (err) {
-    //     expect(err).toBeInstanceOf(Error);
-    //     expect(err.message).toBe("Invalid Token");
-    //   }
-    // });
+      const authHeader = "Bearer refreshToken";
+      try {
+        await AuthService.refresh(authHeader);
+        throw new Error("Expected method to throw");
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Invalid Token");
+      }
+    });
   });
-  //   describe("getAssignedPermission", () => {
-  //     let userServicesGetAssignedPermissionStub;
+    describe("getAssignedPermission", () => {
+      let userServicesGetAssignedPermissionStub;
 
-  //     beforeEach(() => {
-  //         userServicesGetAssignedPermissionStub = sinon.stub(
-  //         userServices,
-  //         "getAssignedPermission"
-  //       );
-  //     });
-  //     afterEach(() => {
-  //       sinon.restore();
-  //     });
+      beforeEach(() => {
+          userServicesGetAssignedPermissionStub = sinon.stub(
+          userServices,
+          "getAssignedPermission"
+        );
+      });
+      afterEach(() => {
+        sinon.restore();
+      });
 
-  //     it("should return permissions", async () => {
-  //         userServicesGetAssignedPermissionStub.resolves(["permission1", "permission2"]);
-  //         const userId = "1";
-  //       const result = await AuthService.getAssignedPermission(userId);
-  //       expect(result).toBe(["permission1", "permission2"]);
+      it("should return permissions", async () => {
+          userServicesGetAssignedPermissionStub.resolves(["permission1", "permission2"]);
+          const userId = "1";
+        const result = await AuthService.getAssignedPermission(userId);
+        expect(result).toStrictEqual(["permission1", "permission2"]);
 
-  //   });
-  // });
+    });
+  });
 });

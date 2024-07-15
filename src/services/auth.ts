@@ -56,30 +56,25 @@ export async function refresh(authorization: string | undefined) {
     throw new UnauthenticatedError("No Bearer Token");
   }
 
-  try {
-    logger.info("Checking if refresh token is valid");
-    const verifiedData = jwt.verify(token[1], config.jwt.secret!) as Iuser;
-
-    if (!verifiedData) {
-      logger.error("Refresh token invalid");
-      throw new UnauthenticatedError("Invalid Token");
-    }
-    const payload = {
-      id: verifiedData.id,
-      name: verifiedData.name,
-      email: verifiedData.email,
-      password: verifiedData.password
-    };
-    const accessToken = sign(payload, config.jwt.secret!, {
-      expiresIn: config.jwt.accessTokenExpiry,
-    });
-
-    logger.info("Refresh token validated");
-    return accessToken;
-  } catch {
-    logger.error("Refresh token could not be verified");
-    throw new UnauthenticatedError("Token Verification Error");
+  logger.info("Checking if refresh token is valid");
+  const verifiedData = jwt.verify(token[1], config.jwt.secret!) as Iuser;
+  if (!verifiedData) {
+    logger.error("Refresh token invalid");
+    throw new UnauthenticatedError("Invalid Token");
   }
+
+  const payload = {
+    id: verifiedData.id,
+    name: verifiedData.name,
+    email: verifiedData.email,
+    password: verifiedData.password,
+  };
+  const accessToken = sign(payload, config.jwt.secret!, {
+    expiresIn: config.jwt.accessTokenExpiry,
+  });
+
+  logger.info("Refresh token validated");
+  return accessToken;
 }
 
 export async function getAssignedPermission(userId: string) {

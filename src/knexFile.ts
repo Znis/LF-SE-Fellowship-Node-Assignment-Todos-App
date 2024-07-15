@@ -18,9 +18,13 @@ const knexConfig: Knex.Config = {
   ...baseKnexConfig,
   migrations: {
     directory: "./database/migrations",
+    extension: "ts",
+    // stub: "./stubs/migration.stub"
   },
   seeds: {
     directory: "./database/seeds",
+    extension: "ts",
+     // stub: "./stubs/seed.stub"
   },
 };
 

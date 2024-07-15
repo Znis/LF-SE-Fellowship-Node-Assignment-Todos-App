@@ -96,7 +96,7 @@ describe("User Model Test Suite", () => {
   describe("assignRole", () => {
     let knexStub = {
       insert: sinon.stub().returnsThis(),
-      into: sinon.stub().resolves(),
+      into: sinon.stub(),
     };
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
@@ -112,18 +112,17 @@ describe("User Model Test Suite", () => {
     it("should assign a role to a user and return success response", async () => {
       const userId = "1";
       const role = "admin";
-
-      const result = await userModel.assignRole(userId, role);
       const data = {
         user_id: userId,
         role_id: role,
       };
-      expect(knexStub.insert.calledOnceWithExactly(data)).toBeTruthy;
 
-      expect(knexStub.into.calledOnceWithExactly("users_roles"));
+      knexStub.into.resolves(data);
+
+      const result = await userModel.assignRole(userId, role);
       expect(result).toStrictEqual({
         modelResponseCode: 200,
-        queryResult: data,
+        queryResult: { role_id: "admin", user_id: "1" },
       });
     });
 
@@ -146,7 +145,6 @@ describe("User Model Test Suite", () => {
       update: sinon.stub().returnsThis(),
       from: sinon.stub().returnsThis(),
       where: sinon.stub(),
-      then: sinon.stub().callsFake((callback) => callback()),
     };
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
@@ -160,23 +158,28 @@ describe("User Model Test Suite", () => {
       sinon.restore();
     });
 
-    // it('should edit a user by id and return success response', async () => {
-    //   const id = '2';
-    //   const user: Iuser = { name: 'John Doe', email: 'john.doe@example.com', password: 'hashedPassword' };
-    //   const mResponse = {modelResponseCode: 200, queryResult : user};
+    it("should edit a user by id and return success response", async () => {
+      const id = "2";
+      const user: Iuser = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "hashedPassword",
+      };
+      const mResponse = { modelResponseCode: 200, queryResult: user };
+      knexStub.where.resolves(1);
 
-    //   const result = await editUserById(id, user);
+      const result = await userModel.editUserById(id, user);
 
-    //   knexStub.where.resolves(1);
-
-    //   expect(knexStub.where.calledOnceWithExactly('id', id));
-    //   expect(knexStub.update.calledOnceWithExactly({
-    //     name: user.name,
-    //     email: user.email,
-    //     password: user.password,
-    //   }));
-    //   expect(result).toStrictEqual(mResponse);
-    // });
+      expect(knexStub.where.calledOnceWithExactly("id", id));
+      expect(
+        knexStub.update.calledOnceWithExactly({
+          name: user.name,
+          email: user.email,
+          password: user.password,
+        })
+      );
+      expect(result).toStrictEqual(mResponse);
+    });
 
     it("should return an error response if editing user fails", async () => {
       const id = "4";

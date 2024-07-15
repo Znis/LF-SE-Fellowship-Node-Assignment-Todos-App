@@ -67,24 +67,26 @@ export default class UserModel {
   async assignRole(userId: string, role: string) {
     try {
       this.logger.info("Attempting to assign role to the user");
-      const data = {
-        user_id: userId,
-        role_id: role,
-      };
+
       const databaseInsert = await this.knexInstance
         .insert({
           user_id: userId,
           role_id: role,
         })
-        .into("users_roles")
-        .then(function () {
-          return {
-            modelResponseCode: 200,
-            queryResult: data,
-          };
-        });
+        .into("users_roles");
+        
+      if (!databaseInsert) {
+        this.logger.error("Cannot insert the data in the database");
+        return {
+          modelResponseCode: 400,
+          queryResult: null,
+        };
+      }
       this.logger.info("Assigning role completed");
-      return databaseInsert;
+      return {
+        modelResponseCode: 200,
+        queryResult: databaseInsert,
+      };
     } catch (error) {
       this.logger.error("Assigning role could not be completed");
       return {
@@ -103,22 +105,20 @@ export default class UserModel {
           password: user.password,
         })
         .from("users")
-        .where("id", id)
-        .then((data) => {
-          if (!data) {
-            this.logger.error(`Editing user with id ${id} failed`);
-            return {
-              modelResponseCode: 400,
-              queryResult: null,
-            };
-          }
-          this.logger.info(`Editing user with id ${id} completed`);
-          return {
-            modelResponseCode: 200,
-            queryResult: user,
-          };
-        });
-      return resultData;
+        .where("id", id);
+
+      if (!resultData) {
+        this.logger.error(`Editing user with id ${id} failed`);
+        return {
+          modelResponseCode: 400,
+          queryResult: null,
+        };
+      }
+      this.logger.info(`Editing user with id ${id} completed`);
+      return {
+        modelResponseCode: 200,
+        queryResult: user,
+      };
     } catch (error) {
       this.logger.error(`Editing user with id ${id} could not be completed`);
       return {
