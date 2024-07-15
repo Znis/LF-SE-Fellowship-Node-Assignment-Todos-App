@@ -26,9 +26,7 @@ services:
 
   backend:
     container_name: backend
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: znis/todoapp:latest
 
     environment:
       - DB_NAME=${DB_NAME}
