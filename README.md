@@ -102,6 +102,6 @@ Create a .env file and specify the necessary args as given in .env.example.
   
 Run the following commands.
 ```bash
-docker-compose upp
+docker-compose up
 ```
 
