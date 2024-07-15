@@ -22,41 +22,40 @@ export function genericErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  switch (error.constructor) {
-    case UnauthenticatedError:
-      logger.error("User Unauthenticated");
-      return res
-        .status(HttpStatusCode.UNAUTHORIZED)
-        .json({ message: error.message });
-  
-    case BadRequestError:
-      logger.error("Bad request error");
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json({ message: error.message });
-
-    case SchemaError:
-      logger.error("Input data schema error");
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json({ message: error.message });
-
-    case ModelError:
-      logger.error("Model response error");
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json({ message: error.message });
-  
-    case ForbiddenError:
-      logger.error("Forbidden resource error");
-      return res
-        .status(HttpStatusCode.FORBIDDEN)
-        .json({ message: error.message });
-  
-    default:
-      logger.error("Internal server error");
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-        message: "Internal Server Error",
-      });
+  if (error instanceof UnauthenticatedError) {
+    logger.error("User Unauthenticated");
+    return res
+      .status(HttpStatusCode.UNAUTHORIZED)
+      .json({ message: error.message });
   }
+
+  if (error instanceof BadRequestError) {
+    logger.error("Bad request error");
+    return res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .json({ message: error.message });
+  }
+  if (error instanceof SchemaError) {
+    logger.error("Input data schema error");
+    return res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .json({ message: error.message });
+  }
+  if (error instanceof ModelError) {
+    logger.error("Model response error");
+    return res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .json({ message: error.message });
+  }
+  if (error instanceof ForbiddenError) {
+    logger.error("Forbidden resource error");
+    return res
+      .status(HttpStatusCode.FORBIDDEN)
+      .json({ message: error.message });
+  }
+
+  logger.error(error.message);
+  return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+    message: error.message,
+  });
 }

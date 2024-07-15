@@ -68,6 +68,7 @@ export async function refresh(authorization: string | undefined) {
       id: verifiedData.id,
       name: verifiedData.name,
       email: verifiedData.email,
+      password: verifiedData.password
     };
     const accessToken = sign(payload, config.jwt.secret!, {
       expiresIn: config.jwt.accessTokenExpiry,
