@@ -16,10 +16,13 @@ It extends the feature of assignment-2 with HTTP Status codes, Custom Error, Aut
 The app can be run on docker with docker-compose command.  
 
 - __assignment-4__  
-It extends the feature of assignment-3 with Input Schema Validation.   
+It extends the feature of assignment-3 with Input Schema Validation.  
 
-- __assignment-5__   
-It extend the assignment-4 branch with unit testing and integration testing.  
+- __assignment-5__  
+It extend the assignment-4 branch with unit testing and integration testing.   
+
+- __assignment-6__   
+The assignment-6 is tasked with initialising database and creating migration and seeder files. The database initialisation, connection, migration and seeder files creation have already been done in earlier assignment branch.  
 
   Following are the usage routes for the API: 
    - Todos  
