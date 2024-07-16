@@ -1,7 +1,7 @@
 import expect from "expect";
 import sinon from "sinon";
 import proxyquire from "proxyquire";
-import Itodos from "../../../interfaces/todos";
+import { Itodos } from "../../../interfaces/todos";
 
 describe("Todos Model Test Suite", () => {
   describe("getTodos", () => {

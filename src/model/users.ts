@@ -1,41 +1,34 @@
-import { Logger } from "winston";
-import { baseKnexConfig } from "../knexFile";
-import knex, { Knex } from "knex";
-import Iuser from "../interfaces/user";
+import { assignRoleQuery, createUserQuery, getAssignedPermissionsForRoleQuery, getRoleIdQuery, getUserByEmailQuery, Iuser } from "../interfaces/user";
 import loggerWithNameSpace from "../utils/logger";
+import { BaseModel } from "./base";
 
-export default class UserModel {
-  knexInstance: Knex;
-  logger: Logger;
-  constructor() {
-    this.knexInstance = knex(baseKnexConfig);
-    this.logger = loggerWithNameSpace("Users Model");
-  }
+const logger = loggerWithNameSpace("Users Model");
 
-  async getUserByEmail(email: string) {
+export default class UserModel extends BaseModel {
+  static async getUserByEmail(email: string) {
     try {
-      this.logger.info(`Querying database for user with email ${email}`);
-      const resultData = await this.knexInstance
+      logger.info(`Querying database for user with email ${email}`);
+      const resultData: getUserByEmailQuery[] = await this.queryBuilder()
         .select("*")
         .from("users")
         .where("email", email);
 
       if (!resultData || !resultData.length) {
-        this.logger.error(`User with email ${email} not found`);
+        logger.error(`User with email ${email} not found`);
         return null;
       }
-      this.logger.info(`User with email ${email} found`);
+      logger.info(`User with email ${email} found`);
       return resultData[0];
     } catch (error) {
-      this.logger.error("Query could not be completed");
+      logger.error("Query could not be completed");
       return null;
     }
   }
 
-  async createUser(user: Iuser) {
+  static async createUser(user: Iuser) {
     try {
-      this.logger.info("Attempting to insert new user in the database");
-      const databaseInsert = await this.knexInstance
+      logger.info("Attempting to insert new user in the database");
+      const databaseInsert: createUserQuery = await this.queryBuilder()
         .insert({
           name: user.name,
           email: user.email,
@@ -48,15 +41,13 @@ export default class UserModel {
           queryResult: null,
         };
       }
-      this.logger.info("Insertion of new user in database completed");
+      logger.info("Insertion of new user in database completed");
       return {
         modelResponseCode: 200,
         queryResult: user,
       };
     } catch (error) {
-      this.logger.error(
-        "Insertion of new user in database could not be completed"
-      );
+      logger.error("Insertion of new user in database could not be completed");
       return {
         modelResponseCode: 400,
         queryResult: null,
@@ -64,41 +55,41 @@ export default class UserModel {
     }
   }
 
-  async assignRole(userId: string, role: string) {
+  static async assignRole(userId: string, role: string) {
     try {
-      this.logger.info("Attempting to assign role to the user");
+      logger.info("Attempting to assign role to the user");
 
-      const databaseInsert = await this.knexInstance
+      const databaseInsert: assignRoleQuery  = await this.queryBuilder()
         .insert({
-          user_id: userId,
-          role_id: role,
+          userId: userId,
+          roleId: role,
         })
         .into("users_roles");
-        
+
       if (!databaseInsert) {
-        this.logger.error("Cannot insert the data in the database");
+        logger.error("Cannot insert the data in the database");
         return {
           modelResponseCode: 400,
           queryResult: null,
         };
       }
-      this.logger.info("Assigning role completed");
+      logger.info("Assigning role completed");
       return {
         modelResponseCode: 200,
         queryResult: databaseInsert,
       };
     } catch (error) {
-      this.logger.error("Assigning role could not be completed");
+      logger.error("Assigning role could not be completed");
       return {
         modelResponseCode: 400,
         queryResult: null,
       };
     }
   }
-  async editUserById(id: string, user: Iuser) {
+  static async editUserById(id: string, user: Iuser) {
     try {
-      this.logger.info(`Attempting to edit user with id ${id} in the database`);
-      const resultData = await this.knexInstance
+      logger.info(`Attempting to edit user with id ${id} in the database`);
+      const resultData: number = await this.queryBuilder()
         .update({
           name: user.name,
           email: user.email,
@@ -108,95 +99,90 @@ export default class UserModel {
         .where("id", id);
 
       if (!resultData) {
-        this.logger.error(`Editing user with id ${id} failed`);
+        logger.error(`Editing user with id ${id} failed`);
         return {
           modelResponseCode: 400,
           queryResult: null,
         };
       }
-      this.logger.info(`Editing user with id ${id} completed`);
+      logger.info(`Editing user with id ${id} completed`);
       return {
         modelResponseCode: 200,
         queryResult: user,
       };
     } catch (error) {
-      this.logger.error(`Editing user with id ${id} could not be completed`);
+      logger.error(`Editing user with id ${id} could not be completed`);
       return {
         modelResponseCode: 400,
         queryResult: null,
       };
     }
   }
-  async deleteUserById(id: string) {
+  static async deleteUserById(id: string) {
     try {
-      this.logger.info(
-        `Attempting to delete user with id ${id} in the database`
-      );
-      const resultData = await this.knexInstance
+      logger.info(`Attempting to delete user with id ${id} in the database`);
+      const resultData: number = await this.queryBuilder()
         .del()
         .from("users")
         .where("id", id);
 
       if (!resultData) {
-        this.logger.error(`Deleting user with id ${id} failed`);
+        logger.error(`Deleting user with id ${id} failed`);
         return {
           modelResponseCode: 400,
           queryResult: false,
         };
       }
-      this.logger.info(`Deleted user with id ${id} completed`);
+      logger.info(`Deleted user with id ${id} completed`);
       return {
         modelResponseCode: 200,
         queryResult: true,
       };
     } catch (error) {
-      this.logger.error(`Deleting user with id ${id} could not be completed`);
+      logger.error(`Deleting user with id ${id} could not be completed`);
       return {
         modelResponseCode: 400,
         queryResult: false,
       };
     }
   }
-  async getRoleId(userId: string) {
+  static async getRoleId(userId: string) {
     try {
-      this.logger.info(`Querying database for roleId of userId ${userId}`);
-      const resultData = await this.knexInstance
+      logger.info(`Querying database for roleId of userId ${userId}`);
+      const resultData: getRoleIdQuery[] = await this.queryBuilder()
         .select("role_id")
-        .from("users_roles")
+        .table("users_roles")
         .where("user_id", userId);
-
       if (!resultData.length) {
-        this.logger.error(`roleId of userId ${userId} not found`);
+        logger.error(`roleId of userId ${userId} not found`);
         return null;
       }
-      this.logger.error(`roleId of userId ${userId} found`);
-      return resultData[0].role_id;
+      logger.info(`roleId of userId ${userId} found`);
+      return resultData[0].roleId;
     } catch (error) {
-      this.logger.error("Query could not be completed");
+      logger.error("Query could not be completed");
       return null;
     }
   }
 
-  async getAssignedPermissionsForRole(roleId: string) {
+  static async getAssignedPermissionsForRole(roleId: string) {
     try {
-      this.logger.info(
+      logger.info(
         `Querying database for assigned permissions of roleId ${roleId}`
       );
-      const resultData = await this.knexInstance
+      const resultData: getAssignedPermissionsForRoleQuery[] = await this.queryBuilder()
         .select("permissions")
         .from("roles_permissions")
         .where("id", roleId);
 
       if (!resultData.length) {
-        this.logger.error(
-          `Assigned permissions for roleId ${roleId} not found`
-        );
+        logger.error(`Assigned permissions for roleId ${roleId} not found`);
         return null;
       }
-      this.logger.info(`Assigned permissions for roleId ${roleId} found`);
+      logger.info(`Assigned permissions for roleId ${roleId} found`);
       return resultData[0].permissions;
     } catch (error) {
-      this.logger.error("Query could not be completed");
+      logger.error("Query could not be completed");
       return null;
     }
   }

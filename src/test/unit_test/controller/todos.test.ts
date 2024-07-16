@@ -1,12 +1,11 @@
 import sinon from "sinon";
 import expect from "expect";
 import * as TodosController from "../../../controller/todos";
-import * as TodosServices from "../../../services/todos";
-import Itodos from "../../../interfaces/todos";
+import TodosServices from "../../../services/todos";
 
 describe("Todos Controller Test Suite", () => {
   let req, res, next;
-  let todo: Itodos = {
+  let todo = {
     title: "dummy",
     description: "dummydummy",
     dueDate: "2001-01-01",
@@ -38,7 +37,7 @@ describe("Todos Controller Test Suite", () => {
       sinon.restore();
     });
     it("should not call the next function if the getTodos is successful", async () => {
-      todosServiceGetTodosStub.resolves([todo, todo]);
+      todosServiceGetTodosStub.resolves({meta:{}, data: [todo, todo]});
 
       await TodosController.getTodos(req, res, next);
 

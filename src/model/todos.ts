@@ -1,37 +1,47 @@
-import { baseKnexConfig } from "../knexFile";
-import knex, { Knex } from "knex";
-import Itodos from "../interfaces/todos";
+import { checkTodoOwnershipQuery, createTodosQuery, getTodosCountQuery, getTodosQuery, getTodosQueryParams, Itodos } from "../interfaces/todos";
 import loggerWithNameSpace from "../utils/logger";
-import { Logger } from "winston";
+import { BaseModel } from "./base";
 
-export default class TodosModel {
-  knexInstance: Knex;
-  logger: Logger;
-  constructor() {
-    this.knexInstance = knex(baseKnexConfig);
-    this.logger = loggerWithNameSpace("Todos Model");
-  }
-  async getTodos(userId: string) {
+const logger = loggerWithNameSpace("Todos Model");
+
+export default class TodosModel extends BaseModel {
+  static async getCount(userId: string) {
     try {
-      this.logger.info("Querying database to get Todos");
-      const resultData = await this.knexInstance
-        .select("*")
-        .from("todos")
-        .where("user_id", userId);
+      logger.info("Querying database to get Todos");
+      const resultData: getTodosCountQuery = await this.queryBuilder()
+        .count("*")
+        .table("todos")
+        .where("user_id", userId).first();
 
-      this.logger.info("Query to get Todos completed");
+      logger.info("Query to get Todos completed");
       return resultData;
     } catch (error) {
-      this.logger.error("Query to get Todos could not be completed");
+      logger.error("Query to get Todos could not be completed");
       console.log(error);
-      return null;
+    }
+  }
+  static async getTodos(filter: getTodosQueryParams, userId: string) {
+    try {
+      logger.info("Querying database to get Todos");
+      const resultData: getTodosQuery[]  = await this.queryBuilder()
+        .select("*")
+        .from("todos")
+        .limit(filter.size)
+        .offset((filter.page - 1) * filter.size)
+        .where("user_id", userId);
+
+      logger.info("Query to get Todos completed");
+      return resultData;
+    } catch (error) {
+      logger.error("Query to get Todos could not be completed");
+      console.log(error);
     }
   }
 
-  async createTodos(userId: string, todos: Itodos) {
+  static async createTodos(userId: string, todos: Itodos) {
     try {
-      this.logger.info("Attempting to insert Todo in database");
-      const databaseInsert = await this.knexInstance
+      logger.info("Attempting to insert Todo in database");
+      const databaseInsert: createTodosQuery[] = await this.queryBuilder()
         .insert({
           title: todos.title,
           description: todos.description,
@@ -42,21 +52,20 @@ export default class TodosModel {
           user_id: userId,
         })
         .into("todos");
-
       if (!databaseInsert) {
         return {
           modelResponseCode: 400,
           queryResult: null,
         };
       }
+      logger.info("Insertion of Todo in database completed");
 
-      this.logger.info("Insertion of Todo in database completed");
       return {
         modelResponseCode: 200,
         queryResult: todos,
       };
     } catch (error) {
-      this.logger.error("Insertion of Todo in database could not be completed");
+      logger.error("Insertion of Todo in database could not be completed");
       console.log(error);
       return {
         modelResponseCode: 400,
@@ -64,20 +73,20 @@ export default class TodosModel {
       };
     }
   }
-  async updateTodosById(userId: string, id: string, todo: Itodos) {
+  static async updateTodosById(userId: string, id: string, todo: Itodos) {
     try {
-      this.logger.info("Atemmpting to verify Todo ownership");
-      const ownership = await this.checkTodoOwnership(userId, id);
+      logger.info("Atemmpting to verify Todo ownership");
+      const ownership: boolean = await this.checkTodoOwnership(userId, id);
       if (!ownership) {
-        this.logger.error("Todo ownership could not be verified");
+        logger.error("Todo ownership could not be verified");
         return {
           modelResponseCode: 403,
           queryResult: null,
         };
       }
-      this.logger.info("Todo ownership verified");
-      this.logger.info("Attempting to update Todo in database");
-      const resultData = await this.knexInstance
+      logger.info("Todo ownership verified");
+      logger.info("Attempting to update Todo in database");
+      const resultData: number = await this.queryBuilder()
         .update({
           title: todo.title,
           description: todo.description,
@@ -87,7 +96,7 @@ export default class TodosModel {
           category: todo.category,
           user_id: userId,
         })
-        .from("todos")
+        .into("todos")
         .where("id", id);
       if (!resultData) {
         return {
@@ -95,14 +104,14 @@ export default class TodosModel {
           queryResult: null,
         };
       }
+      logger.info("Updation of Todo in database completed");
 
-      this.logger.info("Updation of Todo in database completed");
       return {
         modelResponseCode: 200,
         queryResult: todo,
       };
     } catch (error) {
-      this.logger.error("Updation of Todo in database could not be completed");
+      logger.error("Updation of Todo in database could not be completed");
       console.log(error);
       return {
         modelResponseCode: 400,
@@ -110,40 +119,40 @@ export default class TodosModel {
       };
     }
   }
-  async deleteTodosById(userId: string, id: string) {
+  static async deleteTodosById(userId: string, id: string) {
     try {
-      this.logger.info("Atemmpting to verify Todo ownership");
-      const ownership = await this.checkTodoOwnership(userId, id);
+      logger.info("Atempting to verify Todo ownership");
+      const ownership: boolean = await this.checkTodoOwnership(userId, id);
       if (!ownership) {
-        this.logger.error("Todo ownership could not be verified");
+        logger.error("Todo ownership could not be verified");
         return {
           modelResponseCode: 403,
           queryResult: null,
         };
       }
-      this.logger.info("Attempting to delete Todo from database");
-      const resultData = await this.knexInstance("todos")
-        .where("id", id)
-        .andWhere("user_id", userId)
+      logger.info("Attempting to delete Todo from database");
+      const resultData: number = await this.queryBuilder()
         .del()
-        .then(function (data) {
-          if (!data) {
-            return {
-              modelResponseCode: 400,
-              queryResult: false,
-            };
-          }
-          return {
-            modelResponseCode: 200,
-            queryResult: true,
-          };
-        });
-      this.logger.info("Deletion of Todo from database completed");
-      return resultData;
+        .from("todos")
+        .where("id", id)
+        .andWhere("user_id", userId);
+        
+        
+
+      if (!resultData) {
+        return {
+          modelResponseCode: 400,
+          queryResult: false,
+        };
+      }
+      logger.info("Deletion of Todo from database completed");
+
+      return {
+        modelResponseCode: 200,
+        queryResult: true,
+      };
     } catch (error) {
-      this.logger.error(
-        "Deletion of Todo from database could not be completed"
-      );
+      logger.error("Deletion of Todo from database could not be completed");
       console.log(error);
       return {
         modelResponseCode: 400,
@@ -152,23 +161,23 @@ export default class TodosModel {
     }
   }
 
-  async checkTodoOwnership(userId: string, id: string) {
+  static async checkTodoOwnership(userId: string, id: string) {
     try {
-      const resultData = await this.knexInstance
+      const resultData: checkTodoOwnershipQuery = await this.queryBuilder()
         .select("user_id")
         .from("todos")
-        .where("id", id);
-
-      if (!resultData.length) {
+        .where("id", id)
+        .first()
+     
+      if (!resultData) {
         return false;
       }
-      if (resultData[0].user_id == userId) {
+      if (resultData.userId == userId){
         return true;
       }
       return false;
     } catch (error) {
       console.log(error);
-      return false;
     }
   }
 }

@@ -1,6 +1,6 @@
 import HttpStatusCode from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
-import * as AuthService from "../services/auth";
+import AuthService from "../services/auth";
 import loggerWithNameSpace from "../utils/logger";
 
 const logger = loggerWithNameSpace("Auth Controller");

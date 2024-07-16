@@ -1,7 +1,7 @@
 import HttpStatusCode from "http-status-codes";
 import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
-import * as TodosService from "../services/todos";
+import TodosService from "../services/todos";
 import loggerWithNameSpace from "../utils/logger";
 
 const logger = loggerWithNameSpace("Todos Controller");
@@ -14,9 +14,9 @@ export async function getTodos(
   try {
     const currUserId = req.user!.id;
     logger.info("Attempting to get Todos");
-    const data = await TodosService.getTodos(currUserId!);
+    const { meta, data } = await TodosService.getTodos(req.query, currUserId!);
     logger.info("Todos retrieval Successful");
-    return res.status(HttpStatusCode.OK).json(data);
+    return res.status(HttpStatusCode.OK).json({ meta: meta, data: data });
   } catch (error) {
     logger.error("Todos fetch Failed");
     next(error);
@@ -48,10 +48,10 @@ export async function updateTodos(
   try {
     const currUserId = req.user!.id;
 
-    const { id } = req.params;
+    const { id } = req.query;
     const data = req.body;
     logger.info(`Attempting to edit Todo with id ${id}`);
-    const response = await TodosService.updateTodos(currUserId!, id, data);
+    const response = await TodosService.updateTodos(currUserId!, id as string, data);
     logger.info(`Todo with id ${id} updated successfully`);
     return res.status(HttpStatusCode.OK).json({ updated: response });
   } catch (error) {
@@ -66,9 +66,9 @@ export async function deleteTodos(
 ) {
   try {
     const currUserId = req.user!.id;
-    const { id } = req.params;
+    const { id } = req.query;
     logger.info(`Attempting to delete Todo with id ${id}`);
-    await TodosService.deleteTodos(currUserId!, id);
+    await TodosService.deleteTodos(currUserId!, id as string);
     logger.info(`Todo with id ${id} deleted successfully`);
     return res.status(HttpStatusCode.NO_CONTENT).json("Deleted Successfully");
   } catch (error) {

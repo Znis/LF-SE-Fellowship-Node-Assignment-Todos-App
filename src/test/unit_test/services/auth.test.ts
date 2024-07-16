@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import * as AuthService from "../../../services/auth";
+import UserService from "../../../services/users";
+import AuthService from "../../../services/auth";
 import expect from "expect";
 import sinon from "sinon";
-import Iuser from "../../../interfaces/user";
+import { Iuser } from "../../../interfaces/user";
 
 describe("Auth Service Test Suite", () => {
-  const userServices = AuthService.userServices;
+  const userServices = UserService;
   describe("login", () => {
     let userServicesGetUserByEmailStub;
     let bcryptCompareStub;

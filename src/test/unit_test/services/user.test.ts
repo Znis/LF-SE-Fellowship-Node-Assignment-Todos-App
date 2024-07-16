@@ -1,11 +1,12 @@
 import bcrypt from "bcrypt";
 import { expect } from "expect";
 import sinon from "sinon";
-import Iuser from "../../../interfaces/user";
+import { Iuser } from "../../../interfaces/user";
 import UserServices from "../../../services/users";
+import UserModel from "../../../model/users";
 
 describe("User Service Test Suite", () => {
-  const userServices = new UserServices();
+  const userServices = UserServices;
 
   let user: Iuser = {
     id: "1",
@@ -17,7 +18,7 @@ describe("User Service Test Suite", () => {
     let userModelGetUserByEmailStub: sinon.SinonStub;
     beforeEach(() => {
       userModelGetUserByEmailStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "getUserByEmail"
       );
     });
@@ -60,7 +61,7 @@ describe("User Service Test Suite", () => {
     beforeEach(() => {
       bcryptHashStub = sinon.stub(bcrypt, "hash");
       userModelCreateUserStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "createUser"
       );
 
@@ -109,7 +110,7 @@ describe("User Service Test Suite", () => {
     beforeEach(() => {
       bcryptHashStub = sinon.stub(bcrypt, "hash");
       userModelEditUserStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "editUserById"
       );
     });
@@ -155,7 +156,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       userModelDeleteUserStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "deleteUserById"
       );
     });
@@ -193,7 +194,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       userModelAssignRoleStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "assignRole"
       );
     });
@@ -235,7 +236,7 @@ describe("User Service Test Suite", () => {
     let userModelGetRoleIdStub;
 
     beforeEach(() => {
-      userModelGetRoleIdStub = sinon.stub(userServices.userModel, "getRoleId");
+      userModelGetRoleIdStub = sinon.stub(UserModel, "getRoleId");
     });
 
     afterEach(() => {
@@ -257,7 +258,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       userModelGetAssignedPermissionsForRoleStub = sinon.stub(
-        userServices.userModel,
+        UserModel,
         "getAssignedPermissionsForRole"
       );
     });

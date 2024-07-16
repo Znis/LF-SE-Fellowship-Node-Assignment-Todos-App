@@ -2,9 +2,9 @@ import { NextFunction, Response } from "express";
 import { Request } from "../interfaces/auth";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import AuthService from "../services/auth";
 import { UnauthenticatedError } from "../error/unauthenticatedError";
-import Iuser from "../interfaces/user";
-import { getAssignedPermission } from "../services/auth";
+import { Iuser } from "../interfaces/user";
 import { ForbiddenError } from "../error/forbiddenError";
 import loggerWithNameSpace from "../utils/logger";
 import { ModelError } from "../error/modelError";
@@ -48,7 +48,7 @@ export function authorize(permission: string) {
     try{
     const user = req.user!;
     logger.info("Checking for the permission");
-    const permissions = await getAssignedPermission(user.id!);
+    const permissions = await AuthService.getAssignedPermission(user.id!);
     if (!permissions!.includes(permission)) {
       logger.error("Operation not permitted");
       next(new ForbiddenError("Forbidden"));

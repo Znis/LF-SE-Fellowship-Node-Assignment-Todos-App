@@ -1,7 +1,8 @@
 import sinon from "sinon";
 import expect from "expect";
 import * as UserController from "../../../controller/users";
-import Iuser from "../../../interfaces/user";
+import UserServices from "../../../services/users";
+import { Iuser } from "../../../interfaces/user";
 
 describe("Users Controller Test Suite", () => {
   let req, res, next;
@@ -11,7 +12,7 @@ describe("Users Controller Test Suite", () => {
     email: "dummy@dummy.com",
     password: "dummy",
   };
-  const userServices = UserController.userServices;
+  const userServices = UserServices;
 
   describe("getUserByEmail", () => {
     let userServiceGetUserByEmailStub;

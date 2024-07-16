@@ -1,17 +1,18 @@
 import jwt, { sign } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import Iuser from "../interfaces/user";
+import { Iuser } from "../interfaces/user";
 import config from "../config";
 import { UnauthenticatedError } from "../error/unauthenticatedError";
 import loggerWithNameSpace from "../utils/logger";
 import UserServices from "./users";
 
-export const userServices = new UserServices();
 const logger = loggerWithNameSpace("Auth Services");
 
-export async function login(body: Pick<Iuser, "email" | "password">) {
+export default class AuthServices{
+
+static async login(body: Pick<Iuser, "email" | "password">) {
   logger.info(`Checking for existing user with email ${body.email}`);
-  const existingUser = await userServices.getUserByEmail(body.email);
+  const existingUser = await UserServices.getUserByEmail(body.email);
 
   if (!existingUser) {
     logger.error(`User with email ${body.email} not found`);
@@ -41,7 +42,7 @@ export async function login(body: Pick<Iuser, "email" | "password">) {
   return { accessToken: accessToken, refreshToken: refreshToken };
 }
 
-export async function refresh(authorization: string | undefined) {
+static async refresh(authorization: string | undefined) {
   logger.info(
     "Checking for authorization header for regenerating access token"
   );
@@ -77,8 +78,9 @@ export async function refresh(authorization: string | undefined) {
   return accessToken;
 }
 
-export async function getAssignedPermission(userId: string) {
+static async getAssignedPermission(userId: string) {
   logger.info(`Getting assigned permissions for user with userId ${userId}`);
-  const permissions = await userServices.getAssignedPermission(userId);
+  const permissions = await UserServices.getAssignedPermission(userId);
   return permissions;
+}
 }

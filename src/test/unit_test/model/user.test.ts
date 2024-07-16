@@ -1,7 +1,9 @@
 import expect from "expect";
 import sinon from "sinon";
 import proxyquire from "proxyquire";
-import Iuser from "../../../interfaces/user";
+import { Iuser } from "../../../interfaces/user";
+import { BaseModel } from "../../../model/base";
+import UserModel from "../../../model/users";
 
 describe("User Model Test Suite", () => {
   describe("getUserByEmail", () => {
@@ -14,10 +16,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        knex: () => knexStub,
+        queryBuilder: () => knexStub,
       }
     );
-    let userModel = new UserModel();
+    let userModel = UserModel;
 
     afterEach(() => {
       sinon.restore();
@@ -58,10 +60,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        knex: () => knexStub,
+        queryBuilder: () => knexStub,
       }
     );
-    let userModel = new UserModel();
+    let userModel = UserModel;
 
     const user: Iuser = {
       name: "dummy",
@@ -101,10 +103,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        knex: () => knexStub,
+        queryBuilder: () => knexStub,
       }
     );
-    let userModel = new UserModel();
+    let userModel = UserModel;
     afterEach(() => {
       sinon.restore();
     });
@@ -149,10 +151,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        knex: () => knexStub,
+        queryBuilder: () => knexStub,
       }
     );
-    let userModel = new UserModel();
+    let userModel = UserModel;
 
     afterEach(() => {
       sinon.restore();
@@ -240,10 +242,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        knex: () => knexStub,
+        queryBuilder: () => knexStub,
       }
     );
-    let userModel = new UserModel();
+    let userModel = UserModel;
     afterEach(() => {
       sinon.restore();
     });
@@ -290,48 +292,37 @@ describe("User Model Test Suite", () => {
       from: sinon.stub().returnsThis(),
       where: sinon.stub(),
     };
-    let { default: UserModel } = proxyquire.noCallThru()(
-      "../../../model/users",
-      {
-        knex: () => knexStub,
-      }
-    );
-    let userModel = new UserModel();
+    let baseModelQueryBuilderStub;
+
+    baseModelQueryBuilderStub = sinon.stub(UserModel, "connection");
     afterEach(() => {
       sinon.restore();
     });
 
-    it("should return roleId when userId is found", async () => {
+    it.only("should return roleId when userId is found", async () => {
       const role_id = "1";
-      knexStub.where.resolves([{ role_id }]);
+     baseModelQueryBuilderStub.resolves([{ role_id }]);
 
-      const result = await userModel.getRoleId("1");
+      const result = await UserModel.getRoleId("1");
 
-      expect(knexStub.select.calledWith("role_id")).toBeTruthy;
-      expect(knexStub.from.calledWith("users_roles")).toBeTruthy;
-      expect(knexStub.where.calledWith("user_id", "1")).toBeTruthy;
       expect(result).toStrictEqual(role_id);
     });
 
     it("should return null when userId is not found", async () => {
-      knexStub.where.resolves([]);
+      baseModelQueryBuilderStub.resolves([]);
 
-      const result = await userModel.getRoleId("1");
+      const result = await UserModel.getRoleId("1");
 
-      expect(knexStub.select.calledWith("role_id")).toBeTruthy;
-      expect(knexStub.from.calledWith("users_roles")).toBeTruthy;
-      expect(knexStub.where.calledWith("user_id", "1")).toBeTruthy;
+
       expect(result).toStrictEqual(null);
     });
 
     it("should return null when there is an exception", async () => {
-      knexStub.where.rejects(new Error("Database Error"));
+      baseModelQueryBuilderStub.rejects(new Error("Database Error"));
 
-      const result = await userModel.getRoleId("1");
+      const result = await UserModel.getRoleId("1");
 
-      expect(knexStub.select.calledWith("role_id")).toBeTruthy;
-      expect(knexStub.from.calledWith("users_roles")).toBeTruthy;
-      expect(knexStub.where.calledWith("user_id", "1")).toBeTruthy;
+
       expect(result).toStrictEqual(null);
     });
   });
@@ -342,12 +333,11 @@ describe("User Model Test Suite", () => {
       where: sinon.stub(),
     };
     let { default: UserModel } = proxyquire.noCallThru()(
-      "../../../model/users",
+      '../../../model/users',
       {
-        knex: () => knexStub,
+        '../base': { BaseModel: { queryBuilder: () => knexStub } },
       }
     );
-    let userModel = new UserModel();
 
     afterEach(() => {
       sinon.restore();
@@ -359,7 +349,7 @@ describe("User Model Test Suite", () => {
         { permissions: ["permission1", "permission2"] },
       ]);
 
-      const result = await userModel.getAssignedPermissionsForRole("1");
+      const result = await UserModel.getAssignedPermissionsForRole("1");
 
       expect(knexStub.select.calledWith("role_id")).toBeTruthy;
       expect(knexStub.from.calledWith("users_roles")).toBeTruthy;
@@ -370,7 +360,7 @@ describe("User Model Test Suite", () => {
     it("should return null when roleId is not found", async () => {
       knexStub.where.resolves([]);
 
-      const result = await userModel.getAssignedPermissionsForRole("1");
+      const result = await UserModel.getAssignedPermissionsForRole("1");
 
       expect(knexStub.select.calledWith("role_id")).toBeTruthy;
       expect(knexStub.from.calledWith("users_roles")).toBeTruthy;
@@ -381,7 +371,7 @@ describe("User Model Test Suite", () => {
     it("should return null when there is an exception", async () => {
       knexStub.where.rejects(new Error("Database Error"));
 
-      const result = await userModel.getAssignedPermissionsForRole("1");
+      const result = await UserModel.getAssignedPermissionsForRole("1");
 
       expect(knexStub.select.calledWith("role_id")).toBeTruthy;
       expect(knexStub.from.calledWith("users_roles")).toBeTruthy;

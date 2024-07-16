@@ -58,7 +58,7 @@ describe("User Integration Test Suite", () => {
         .send({ email: "yolo@yolo.com" });
 
       await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/users/delete/?id=${id.body.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
@@ -95,14 +95,14 @@ describe("User Integration Test Suite", () => {
     });
     afterEach(async () => {
       await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/users/delete/?id=${id.body.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
 
     it("Should edit the user", async () => {
       const response = await request(app)
-        .put(`/users/edit/${id.body.id}`)
+        .put(`/users/edit/?id=${id.body.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
         .send({ ...user, name: "YOLO" });
@@ -133,7 +133,7 @@ describe("User Integration Test Suite", () => {
 
     it("Should delete the user", async () => {
       const response = await request(app)
-        .delete(`/users/delete/${id.body.id}`)
+        .delete(`/users/delete/?id=${id.body.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
 

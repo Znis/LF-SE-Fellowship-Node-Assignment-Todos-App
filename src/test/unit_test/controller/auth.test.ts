@@ -1,7 +1,7 @@
 import sinon from "sinon";
 import expect from "expect";
 import * as AuthController from "../../../controller/auth";
-import * as AuthServices from "../../../services/auth";
+import AuthServices from "../../../services/auth";
 
 describe("Auth Controller Test Suite", () => {
   describe("login", () => {

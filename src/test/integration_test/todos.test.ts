@@ -7,6 +7,7 @@ import {
   genericErrorHandler,
   notFoundError,
 } from "../../middleware/errorHandler";
+import { Itodos } from "../../interfaces/todos";
 
 describe("Todos Integration Test Suite", () => {
   const app = express();
@@ -15,7 +16,7 @@ describe("Todos Integration Test Suite", () => {
 
   app.use(genericErrorHandler);
   app.use(notFoundError);
-  let todo = {
+  let todo: Itodos = {
     title: "dummyxyz",
     description: "dummydummy",
     dueDate: "2001-01-01",
@@ -39,7 +40,7 @@ describe("Todos Integration Test Suite", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
 
-      expect(response.body).toStrictEqual([]);
+      expect(response.body.data).toStrictEqual([]);
     });
   });
   describe("createTodo API Test", () => {
@@ -56,9 +57,9 @@ describe("Todos Integration Test Suite", () => {
         .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
-      const todo = todos.body.find((todo) => todo.title === "dummyxyz");
+      const id = (todos.body.data.find((todo) => todo.title === "dummyxyz")).id;
       await request(app)
-        .delete(`/todos/delete/${todo.id}`)
+        .delete(`/todos/delete/?id=${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
@@ -91,18 +92,18 @@ describe("Todos Integration Test Suite", () => {
         .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
-      id = todos.body.find((todo) => todo.title === "dummyxyz").id;
+      id = todos.body.data.find((todo) => todo.title === "dummyxyz").id;
     });
     afterEach(async () => {
       await request(app)
-        .delete(`/todos/delete/${id}`)
+        .delete(`/todos/delete/?id=${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
     });
 
     it("Should edit the todo", async () => {
       const response = await request(app)
-        .put(`/todos/update/${id}`)
+        .put(`/todos/update/?id=${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json")
         .send({ ...todo, title: "abcDummy" });
@@ -128,12 +129,12 @@ describe("Todos Integration Test Suite", () => {
         .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
-      id = todos.body.find((todo) => todo.title === "dummyxyz").id;
+      id = todos.body.data.find((todo) => todo.title === "dummyxyz").id;
     });
 
-    it("Should delete the user", async () => {
+    it("Should delete the todo", async () => {
       const response = await request(app)
-        .delete(`/todos/delete/${id}`)
+        .delete(`/todos/delete/?id=${id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
 

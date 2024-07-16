@@ -24,7 +24,7 @@ usersRouter.post(
 );
 
 usersRouter.put(
-  "/edit/:id",
+  "/edit/",
   validateReqQuery(editOrdeleteUserQuerySchema),
   validateReqBody(createOrEditUserBodySchema),
   auth,
@@ -33,7 +33,7 @@ usersRouter.put(
 );
 
 usersRouter.delete(
-  "/delete/:id",
+  "/delete/",
   validateReqQuery(editOrdeleteUserQuerySchema),
   auth,
   authorize(permissions.delete_user),

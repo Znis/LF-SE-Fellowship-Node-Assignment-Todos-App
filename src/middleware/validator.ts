@@ -8,7 +8,7 @@ const logger = loggerWithNameSpace("Input Validator Middleware");
 export function validateReqQuery(schema: Schema) {
   return (req: Request, res: Response, next: NextFunction) => {
     logger.info("Validating Schema");
-    const { error, value } = schema.validate(req.query.id);
+    const { error, value } = schema.validate(req.query);
 
     if (error) {
       logger.error("Schema Invalid");

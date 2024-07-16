@@ -10,12 +10,13 @@ import { permissions } from "../enums/users";
 import { validateReqBody, validateReqQuery } from "../middleware/validator";
 import {
   createOrUpdateTodoBodySchema,
-  updateOrdeleteTodoQuerySchema,
+  getTodosSchema,
+  updateOrDeleteTodoQuerySchema,
 } from "../schema/todos";
 
 const todosRouter = express();
 
-todosRouter.post("/", auth, authorize(permissions.view_todo), getTodos);
+todosRouter.post("/", validateReqQuery(getTodosSchema), auth, authorize(permissions.view_todo), getTodos);
 
 todosRouter.post(
   "/create",
@@ -26,8 +27,8 @@ todosRouter.post(
 );
 
 todosRouter.put(
-  "/update/:id",
-  validateReqQuery(updateOrdeleteTodoQuerySchema),
+  "/update/",
+  validateReqQuery(updateOrDeleteTodoQuerySchema),
   validateReqBody(createOrUpdateTodoBodySchema),
   auth,
   authorize(permissions.update_todo),
@@ -35,8 +36,8 @@ todosRouter.put(
 );
 
 todosRouter.delete(
-  "/delete/:id",
-  validateReqQuery(updateOrdeleteTodoQuerySchema),
+  "/delete/",
+  validateReqQuery(updateOrDeleteTodoQuerySchema),
   auth,
   authorize(permissions.delete_todo),
   deleteTodos

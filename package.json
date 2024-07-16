@@ -21,6 +21,7 @@
     "braces": "^3.0.3",
     "bytes": "^3.1.2",
     "call-bind": "^1.0.7",
+    "camelize": "^1.0.1",
     "chokidar": "^3.6.0",
     "concat-map": "^0.0.1",
     "content-disposition": "^0.5.4",
@@ -103,6 +104,7 @@
     "statuses": "^2.0.1",
     "supports-color": "^5.5.0",
     "to-regex-range": "^5.0.1",
+    "to-snake-case": "^1.0.0",
     "toidentifier": "^1.0.1",
     "touch": "^3.1.1",
     "type-is": "^1.6.18",
@@ -116,6 +118,7 @@
     "yn": "^3.1.1"
   },
   "devDependencies": {
+    "@types/camelize": "^1.0.0",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.0",
     "@types/expect": "^24.3.0",
@@ -124,6 +127,7 @@
     "@types/pg": "^8.11.6",
     "@types/sinon": "^17.0.3",
     "@types/supertest": "^6.0.2",
+    "@types/to-snake-case": "^1.0.2",
     "@types/typescript": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

@@ -1,106 +1,99 @@
 import bcrypt from "bcrypt";
-import Iuser from "../interfaces/user";
+import { Iuser } from "../interfaces/user";
 import UserModel from "../model/users";
 import { roles } from "../enums/users";
 import { ModelError } from "../error/modelError";
 import loggerWithNameSpace from "../utils/logger";
-import { Logger } from "winston";
 
+const logger = loggerWithNameSpace("Users Service");
+const salt = 10;
 export default class UserServices {
-  logger: Logger;
-  salt: number;
-  userModel: UserModel;
-  constructor() {
-    this.logger = loggerWithNameSpace("Users Service");
-    this.salt = 10;
-    this.userModel = new UserModel();
-  }
 
-  async getUserByEmail(email: string) {
-    this.logger.info(`Getting User with email ${email} from Users Model`);
-    const data = await this.userModel.getUserByEmail(email);
+  static async getUserByEmail(email: string) {
+    logger.info(`Getting User with email ${email} from Users Model`);
+    const data = await UserModel.getUserByEmail(email);
     return data;
   }
 
-  async createUser(user: Iuser) {
-    this.logger.info("Creating new user");
+  static async createUser(user: Iuser) {
+    logger.info("Creating new user");
 
-    const hashedPassword = await bcrypt.hash(user.password, this.salt);
+    const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
-    const createUserResponse = await this.userModel.createUser(user);
+    const createUserResponse = await UserModel.createUser(user);
 
     if (createUserResponse.modelResponseCode != 200) {
-      this.logger.error("Could not create new user");
+      logger.error("Could not create new user");
       throw new ModelError("Could not create User");
     }
 
     const newUser = await this.getUserByEmail(user.email);
 
-    this.logger.info("Assigning role to new user");
+    logger.info("Assigning role to new user");
     await this.assignRole(newUser!.id!, roles.user);
 
     return createUserResponse.queryResult;
   }
 
-  async editUser(id: string, user: Iuser) {
-    this.logger.info(`Editing user with id ${id}`);
-    const hashedPassword = await bcrypt.hash(user.password, this.salt);
+  static async editUser(id: string, user: Iuser) {
+    logger.info(`Editing user with id ${id}`);
+    const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
     const { modelResponseCode, queryResult } =
-      await this.userModel.editUserById(id, user);
+      await UserModel.editUserById(id, user);
     if (modelResponseCode != 200) {
-      this.logger.error(`Could not edit user with id ${id}`);
+      logger.error(`Could not edit user with id ${id}`);
       throw new ModelError("Could not edit User");
     }
     return queryResult;
   }
 
-  async deleteUser(id: string) {
-    this.logger.info(`Deleting user with id ${id}`);
+  static async deleteUser(id: string) {
+    logger.info(`Deleting user with id ${id}`);
     const { modelResponseCode, queryResult } =
-      await this.userModel.deleteUserById(id);
+      await UserModel.deleteUserById(id);
     if (modelResponseCode != 200) {
-      this.logger.error(`Could not delete user with id ${id}`);
+      logger.error(`Could not delete user with id ${id}`);
       throw new ModelError("Could not delete User");
     }
     return queryResult;
   }
 
-  async assignRole(userId: string, role: string) {
-    this.logger.info(`Assigning role to the user with id ${userId}`);
-    const { modelResponseCode, queryResult } = await this.userModel.assignRole(
+  static async assignRole(userId: string, role: string) {
+    logger.info(`Assigning role to the user with id ${userId}`);
+    const { modelResponseCode, queryResult } = await UserModel.assignRole(
       userId,
       role
     );
     if (modelResponseCode != 200) {
-      this.logger.error(`Could not assign role to the user with id ${userId}`);
+      logger.error(`Could not assign role to the user with id ${userId}`);
       throw new ModelError("Could not assign Role");
     }
     return queryResult;
   }
 
-  async getRoleId(userId: string) {
-    const data = await this.userModel.getRoleId(userId);
+  static async getRoleId(userId: string) {
+    const data = await UserModel.getRoleId(userId);
     return data;
   }
 
-  async getAssignedPermissionsForRole(roleId: string) {
-    const data = await this.userModel.getAssignedPermissionsForRole(roleId);
+  static async getAssignedPermissionsForRole(roleId: string) {
+    const data = await UserModel.getAssignedPermissionsForRole(roleId);
     return data;
   }
 
-  async getAssignedPermission(userId: string) {
-    this.logger.info(
+  static async getAssignedPermission(userId: string) {
+    logger.info(
       `Getting assigned permissions for user with userId ${userId}`
     );
     const roleId = await this.getRoleId(userId);
     if (!roleId!) {
-      this.logger.error(`roleId for user ${userId} not found`);
+      logger.error(`roleId for user ${userId} not found`);
       return [];
     }
     const permissions = await this.getAssignedPermissionsForRole(roleId!);
     if (!permissions!) {
-      this.logger.error(`No any permission for user with userId ${userId}`);
+      logger.error(`No any permission for user with userId ${userId}`);
       return [];
     }
     return permissions!;
