@@ -24,22 +24,34 @@ It extend the assignment-4 branch with unit testing and integration testing.
 - __assignment-6__   
 The assignment-6 is tasked with initialising database and creating migration and seeder files. The database initialisation, connection, migration and seeder files creation have already been done in earlier assignment branch.  
 
+- __assignment-7__   
+It extend the assignment-7 with improved way of database connection and executing queries, size and pagination for getTodos query, adds types for query result.    
+
   Following are the usage routes for the API: 
    - Todos  
-POST /todos/ -> fetch all the todos.  
-POST /todos/create -> Create the new todo.  
-PUT /todos/update/:id -> Update the existing todo.  
-DELETE /todos/delete/:id -> Delete the existing todo. 
+POST /todos/ -> fetch all the todos. (query params like size and page can be provided. Default is size as 10 and page as 1)
+  
+     POST /todos/create -> Create the new todo. (requires body as Todo) 
  
+     PUT /todos/update/ -> Update the existing todo. (requires id param as Todo id and body as Todo)
+  
+     DELETE /todos/delete/ -> Delete the existing todo. (requires id param as Todo id)
+ 
+
    - Users (Only for ADMIN role)  
-POST /users/ -> fetch the user with email.  
-POST /users/register-> Create the new user.  
-PUT /users/edit/:id -> Update the existing user.  
-DELETE /users/delete/:id -> Delete the existing user.  
+     POST /users/ -> fetch the user with email.  
+
+     POST /users/register-> Create the new user. (requires body as User) 
+  
+     PUT /users/edit/ -> Update the existing user. (requires id param as user id abd body as User)
+ 
+     DELETE /users/delete/ -> Delete the existing user. (requires id param as user id) 
+
 
    - Auth   
-POST /auth/login -> Login with email and password and get the tokens.  
-POST /auth/refresh-> Create the new access token with refresh token.
+     POST /auth/login -> Login with email and password and get the tokens. (requires body as login creds) 
+  
+     POST /auth/refresh-> Create the new access token with refresh token. (requires refresh token in auth headers)
 
   After initializing the API, the database is seeded with a few data in Users table (admin account) and in roles_permissions table with roles (admin and user) and their respective permissions. Check the seeder file in database/seeds directory. The default admin account credentials are:  
 
