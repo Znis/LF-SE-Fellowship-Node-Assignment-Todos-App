@@ -25,18 +25,18 @@ describe("Todos Service Test Suite", () => {
     it("should return todos when the todos are available for the user", async () => {
       todosModelGetTodosStub.resolves([todo, todo]);
       const id = "1";
-      const filter = {size:10, page:1};
+      const filter = { size: 10, page: 1 };
       const mResponse = [todo, todo];
-      const result = await TodosService.getTodos(filter,id);
+      const result = await TodosService.getTodos(filter, id);
 
       expect(result.data).toStrictEqual(mResponse);
     });
     it("should return empty array when the todos are not available for the user", async () => {
       todosModelGetTodosStub.resolves([]);
       const id = "1";
-      const filter = {size:10, page:1};
+      const filter = { size: 10, page: 1 };
       const mResponse = [];
-      const result = await TodosService.getTodos(filter,id);
+      const result = await TodosService.getTodos(filter, id);
 
       expect(result.data).toStrictEqual(mResponse);
     });
@@ -60,11 +60,8 @@ describe("Todos Service Test Suite", () => {
 
       expect(result).toStrictEqual(mResponse);
     });
-    it("should throw an error if the model response code is not 200", async () => {
-      todosModelCreateTodosStub.resolves({
-        modelResponseCode: 400,
-        queryResult: null,
-      });
+    it("should throw an error if the model returns null", async () => {
+      todosModelCreateTodosStub.resolves(null);
       const id = "1";
       try {
         await TodosService.createTodos(id, todo);
@@ -75,19 +72,22 @@ describe("Todos Service Test Suite", () => {
       }
     });
   });
-  describe("createTodos", () => {
+  describe("updateTodos", () => {
     let todosModelUpdateTodosStub;
+    let todosServicecheckTodoOwnershipStub;
     beforeEach(() => {
       todosModelUpdateTodosStub = sinon.stub(todosModel, "updateTodosById");
+      todosServicecheckTodoOwnershipStub = sinon.stub(
+        TodosService,
+        "checkTodoOwnership"
+      );
     });
     afterEach(() => {
       sinon.restore();
     });
     it("should update todo for the user", async () => {
-      todosModelUpdateTodosStub.resolves({
-        modelResponseCode: 200,
-        queryResult: todo,
-      });
+      todosModelUpdateTodosStub.resolves(1);
+      todosServicecheckTodoOwnershipStub.resolves(true);
       const id = "1";
       const todoId = "1";
       const mResponse = todo;
@@ -96,10 +96,7 @@ describe("Todos Service Test Suite", () => {
       expect(result).toStrictEqual(mResponse);
     });
     it("should throw an forbidden error if the todo does not belong to the user", async () => {
-      todosModelUpdateTodosStub.resolves({
-        modelResponseCode: 403,
-        queryResult: null,
-      });
+      todosServicecheckTodoOwnershipStub.resolves(false);
       const id = "1";
       const todoId = "1";
       try {
@@ -110,11 +107,9 @@ describe("Todos Service Test Suite", () => {
         expect(err.message).toBe("Forbidden");
       }
     });
-    it("should throw an error if the model response code is not 200", async () => {
-      todosModelUpdateTodosStub.resolves({
-        modelResponseCode: 400,
-        queryResult: null,
-      });
+    it("should throw an error if the model returns null", async () => {
+      todosModelUpdateTodosStub.resolves(null);
+      todosServicecheckTodoOwnershipStub.resolves(true);
       const id = "1";
       const todoId = "1";
       try {
@@ -128,17 +123,21 @@ describe("Todos Service Test Suite", () => {
   });
   describe("deleteTodos", () => {
     let todosModelDeleteTodosStub;
+    let todosServicecheckTodoOwnershipStub;
     beforeEach(() => {
       todosModelDeleteTodosStub = sinon.stub(todosModel, "deleteTodosById");
+      todosServicecheckTodoOwnershipStub = sinon.stub(
+        TodosService,
+        "checkTodoOwnership"
+      );
     });
     afterEach(() => {
       sinon.restore();
     });
     it("should delete todo for the user", async () => {
-      todosModelDeleteTodosStub.resolves({
-        modelResponseCode: 200,
-        queryResult: true,
-      });
+      todosModelDeleteTodosStub.resolves(1);
+      todosServicecheckTodoOwnershipStub.resolves(true);
+
       const id = "1";
       const todoId = "1";
       const mResponse = true;
@@ -147,10 +146,7 @@ describe("Todos Service Test Suite", () => {
       expect(result).toStrictEqual(mResponse);
     });
     it("should throw an forbidden error if the todo does not belong to the user", async () => {
-      todosModelDeleteTodosStub.resolves({
-        modelResponseCode: 403,
-        queryResult: false,
-      });
+      todosServicecheckTodoOwnershipStub.resolves(false);
       const id = "1";
       const todoId = "1";
       try {
@@ -161,11 +157,10 @@ describe("Todos Service Test Suite", () => {
         expect(err.message).toBe("Forbidden");
       }
     });
-    it("should throw an error if the model response code is not 200", async () => {
-      todosModelDeleteTodosStub.resolves({
-        modelResponseCode: 400,
-        queryResult: false,
-      });
+    it("should throw an error if the model response is null", async () => {
+      todosModelDeleteTodosStub.resolves(null);
+      todosServicecheckTodoOwnershipStub.resolves(true);
+
       const id = "1";
       const todoId = "1";
       try {

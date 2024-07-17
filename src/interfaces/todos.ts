@@ -14,8 +14,9 @@ export interface getTodosQueryParams {
 }
 
 export interface getTodosCountQuery {
-  count:number
-}export interface getTodosQuery {
+  count: number;
+}
+export interface getTodosQuery {
   id: string;
   title: string;
   description: string;
@@ -26,20 +27,6 @@ export interface getTodosCountQuery {
   userId: number;
 }
 
-export interface createTodosQuery {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-  dueDate: string;
-  priority: string;
-  category: string;
-  userId: number;
-}
-
-export interface updateTodosQuery extends createTodosQuery {
-}
-
-export interface checkTodoOwnershipQuery{
-  userId: string
+export interface checkTodoOwnershipQuery {
+  userId: string;
 }

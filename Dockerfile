@@ -9,7 +9,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-
 # Set a default port value if not provided
 ARG PORT=8000
 ENV PORT=${PORT}

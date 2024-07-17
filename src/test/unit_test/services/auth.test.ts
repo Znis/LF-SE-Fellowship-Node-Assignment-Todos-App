@@ -129,25 +129,27 @@ describe("Auth Service Test Suite", () => {
       }
     });
   });
-    describe("getAssignedPermission", () => {
-      let userServicesGetAssignedPermissionStub;
+  describe("getAssignedPermission", () => {
+    let userServicesGetAssignedPermissionStub;
 
-      beforeEach(() => {
-          userServicesGetAssignedPermissionStub = sinon.stub(
-          userServices,
-          "getAssignedPermission"
-        );
-      });
-      afterEach(() => {
-        sinon.restore();
-      });
+    beforeEach(() => {
+      userServicesGetAssignedPermissionStub = sinon.stub(
+        userServices,
+        "getAssignedPermission"
+      );
+    });
+    afterEach(() => {
+      sinon.restore();
+    });
 
-      it("should return permissions", async () => {
-          userServicesGetAssignedPermissionStub.resolves(["permission1", "permission2"]);
-          const userId = "1";
-        const result = await AuthService.getAssignedPermission(userId);
-        expect(result).toStrictEqual(["permission1", "permission2"]);
-
+    it("should return permissions", async () => {
+      userServicesGetAssignedPermissionStub.resolves([
+        "permission1",
+        "permission2",
+      ]);
+      const userId = "1";
+      const result = await AuthService.getAssignedPermission(userId);
+      expect(result).toStrictEqual(["permission1", "permission2"]);
     });
   });
 });

@@ -17,10 +17,7 @@ describe("User Service Test Suite", () => {
   describe("getUserByEmail", () => {
     let userModelGetUserByEmailStub: sinon.SinonStub;
     beforeEach(() => {
-      userModelGetUserByEmailStub = sinon.stub(
-        UserModel,
-        "getUserByEmail"
-      );
+      userModelGetUserByEmailStub = sinon.stub(UserModel, "getUserByEmail");
     });
     afterEach(() => {
       userModelGetUserByEmailStub.restore();
@@ -60,10 +57,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       bcryptHashStub = sinon.stub(bcrypt, "hash");
-      userModelCreateUserStub = sinon.stub(
-        UserModel,
-        "createUser"
-      );
+      userModelCreateUserStub = sinon.stub(UserModel, "createUser");
 
       getUserByEmailStub = sinon
         .stub(userServices, "getUserByEmail")
@@ -79,20 +73,16 @@ describe("User Service Test Suite", () => {
 
     it("Should create new user", async () => {
       bcryptHashStub.resolves("hashedPassword");
-      userModelCreateUserStub.resolves({
-        modelResponseCode: 200,
-        queryResult: { ...user, password: "hashedPassword" },
-      });
+      userModelCreateUserStub.resolves(1);
       assignRoleStub = sinon.stub(userServices, "assignRole").resolves();
 
       const result = await userServices.createUser(user);
       expect(userModelCreateUserStub.callCount).toBe(1);
       expect(result).toStrictEqual({ ...user, password: "hashedPassword" });
     });
-    it("should throw an error if createUser response code is not 200", async () => {
-      const queryResult = { modelResponseCode: 400, queryResult: null };
+    it("should throw an error if createUser response is null", async () => {
       bcryptHashStub.resolves("hashedPassword");
-      userModelCreateUserStub.resolves(queryResult);
+      userModelCreateUserStub.resolves(null);
 
       try {
         await userServices.createUser(user);
@@ -109,10 +99,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       bcryptHashStub = sinon.stub(bcrypt, "hash");
-      userModelEditUserStub = sinon.stub(
-        UserModel,
-        "editUserById"
-      );
+      userModelEditUserStub = sinon.stub(UserModel, "editUserById");
     });
 
     afterEach(() => {
@@ -122,25 +109,19 @@ describe("User Service Test Suite", () => {
     it("should edit a user and return the query result", async () => {
       const id = "1";
       const hashedPassword = "hashedpassword";
-      const modelResult = {
-        modelResponseCode: 200,
-        queryResult: { ...user, password: hashedPassword },
-      };
       bcryptHashStub.resolves(hashedPassword);
-      userModelEditUserStub.resolves(modelResult);
+      userModelEditUserStub.resolves(1);
 
       const result = await userServices.editUser(id, user);
 
-      expect(result).toStrictEqual(modelResult.queryResult);
+      expect(result).toStrictEqual({ ...user, password: hashedPassword });
     });
 
-    it("should throw an error if model response code is not 200", async () => {
+    it("should throw an error if model response is null", async () => {
       const id = "1";
       const hashedPassword = "hashedpassword";
-      const modelResult = { modelResponseCode: 400, queryResult: null };
-
       bcryptHashStub.resolves(hashedPassword);
-      userModelEditUserStub.resolves(modelResult);
+      userModelEditUserStub.resolves(null);
 
       try {
         await userServices.editUser(id, user);
@@ -155,10 +136,7 @@ describe("User Service Test Suite", () => {
     let userModelDeleteUserStub;
 
     beforeEach(() => {
-      userModelDeleteUserStub = sinon.stub(
-        UserModel,
-        "deleteUserById"
-      );
+      userModelDeleteUserStub = sinon.stub(UserModel, "deleteUserById");
     });
 
     afterEach(() => {
@@ -167,18 +145,16 @@ describe("User Service Test Suite", () => {
 
     it("should delete a user and return the query result", async () => {
       const id = "1";
-      const modelResult = { modelResponseCode: 200, queryResult: true };
-      userModelDeleteUserStub.resolves(modelResult);
+      userModelDeleteUserStub.resolves(1);
 
       const result = await userServices.deleteUser(id);
 
-      expect(result).toStrictEqual(modelResult.queryResult);
+      expect(result).toStrictEqual(true);
     });
 
-    it("should throw an error if model response code is not 200", async () => {
+    it("should throw an error if model response is null", async () => {
       const id = "1";
-      const modelResult = { modelResponseCode: 400, queryResult: false };
-      userModelDeleteUserStub.resolves(modelResult);
+      userModelDeleteUserStub.resolves(null);
 
       try {
         await userServices.deleteUser(id);
@@ -193,10 +169,7 @@ describe("User Service Test Suite", () => {
     let userModelAssignRoleStub;
 
     beforeEach(() => {
-      userModelAssignRoleStub = sinon.stub(
-        UserModel,
-        "assignRole"
-      );
+      userModelAssignRoleStub = sinon.stub(UserModel, "assignRole");
     });
 
     afterEach(() => {
@@ -206,22 +179,17 @@ describe("User Service Test Suite", () => {
     it("should assign role to a user and return the query result", async () => {
       const id = "1";
       const roleId = "1";
-      const modelResult = {
-        modelResponseCode: 200,
-        queryResult: { user_id: id, role_id: roleId },
-      };
-      userModelAssignRoleStub.resolves(modelResult);
+      userModelAssignRoleStub.resolves({ user_id: id, role_id: roleId });
 
       const result = await userServices.assignRole(id, roleId);
 
-      expect(result).toStrictEqual(modelResult.queryResult);
+      expect(result).toStrictEqual({ user_id: id, role_id: roleId });
     });
 
-    it("should throw an error if model response code is not 200", async () => {
+    it("should throw an error if model response is null", async () => {
       const id = "1";
       const roleId = "1";
-      const modelResult = { modelResponseCode: 400, queryResult: null };
-      userModelAssignRoleStub.resolves(modelResult);
+      userModelAssignRoleStub.resolves(null);
 
       try {
         await userServices.assignRole(id, roleId);
@@ -246,7 +214,7 @@ describe("User Service Test Suite", () => {
     it("should assign role to a user and return the query result", async () => {
       const id = "1";
       const roleId = "1";
-      userModelGetRoleIdStub.resolves(roleId);
+      userModelGetRoleIdStub.resolves({ roleId: roleId });
 
       const result = await userServices.getRoleId(id);
 
@@ -270,7 +238,9 @@ describe("User Service Test Suite", () => {
     it("should get assigned permissions for the role and return the query result", async () => {
       const roleId = "1";
       const permissions = ["permission1", "permission2"];
-      userModelGetAssignedPermissionsForRoleStub.resolves(permissions);
+      userModelGetAssignedPermissionsForRoleStub.resolves({
+        permissions: permissions,
+      });
 
       const result = await userServices.getAssignedPermissionsForRole(roleId);
 
