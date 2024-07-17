@@ -61,7 +61,7 @@ POST /todos/ -> fetch all the todos. (query params like size and page can be pro
 
 
   The app can be run on docker with docker-compose command. 
-Clone the repo and switch to branch assignment-5 and run the command.    
+Clone the repo and switch to branch assignment-7 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
   Run the following commands.
@@ -112,7 +112,7 @@ npm start
 ```
 OR,  
 
-Clone the repo and switch to branch assignment-5 and run the command.    
+Clone the repo and switch to branch assignment-7 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
 Run the following commands.
