@@ -1,12 +1,18 @@
 import knex from "knex";
-import { assignRoleQuery, createUserQuery, getAssignedPermissionsForRoleQuery, getRoleIdQuery, getUserByEmailQuery, Iuser } from "../interfaces/user";
+import {
+  assignRoleQuery,
+  createUserQuery,
+  getAssignedPermissionsForRoleQuery,
+  getRoleIdQuery,
+  getUserByEmailQuery,
+  Iuser,
+} from "../interfaces/user";
 import loggerWithNameSpace from "../utils/logger";
 import { BaseModel } from "./base";
 
 const logger = loggerWithNameSpace("Users Model");
 
 export default class UserModel extends BaseModel {
-
   static async getUserByEmail(email: string) {
     try {
       logger.info(`Querying database for user with email ${email}`);
@@ -61,7 +67,7 @@ export default class UserModel extends BaseModel {
     try {
       logger.info("Attempting to assign role to the user");
 
-      const databaseInsert: assignRoleQuery  = await this.queryBuilder()
+      const databaseInsert: assignRoleQuery = await this.queryBuilder()
         .insert({
           userId: userId,
           roleId: role,
@@ -172,10 +178,11 @@ export default class UserModel extends BaseModel {
       logger.info(
         `Querying database for assigned permissions of roleId ${roleId}`
       );
-      const resultData: getAssignedPermissionsForRoleQuery[] = await this.queryBuilder()
-        .select("permissions")
-        .from("roles_permissions")
-        .where("id", roleId);
+      const resultData: getAssignedPermissionsForRoleQuery[] =
+        await this.queryBuilder()
+          .select("permissions")
+          .from("roles_permissions")
+          .where("id", roleId);
 
       if (!resultData.length) {
         logger.error(`Assigned permissions for roleId ${roleId} not found`);

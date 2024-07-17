@@ -51,7 +51,11 @@ export async function updateTodos(
     const { id } = req.query;
     const data = req.body;
     logger.info(`Attempting to edit Todo with id ${id}`);
-    const response = await TodosService.updateTodos(currUserId!, id as string, data);
+    const response = await TodosService.updateTodos(
+      currUserId!,
+      id as string,
+      data
+    );
     logger.info(`Todo with id ${id} updated successfully`);
     return res.status(HttpStatusCode.OK).json({ updated: response });
   } catch (error) {

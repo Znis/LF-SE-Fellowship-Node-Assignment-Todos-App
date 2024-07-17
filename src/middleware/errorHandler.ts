@@ -41,7 +41,7 @@ export function genericErrorHandler(
       .status(HttpStatusCode.BAD_REQUEST)
       .json({ message: error.message });
   }
-  
+
   if (error instanceof ModelError) {
     logger.error("Model response error");
     return res

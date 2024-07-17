@@ -37,7 +37,7 @@ describe("Todos Controller Test Suite", () => {
       sinon.restore();
     });
     it("should not call the next function if the getTodos is successful", async () => {
-      todosServiceGetTodosStub.resolves({meta:{}, data: [todo, todo]});
+      todosServiceGetTodosStub.resolves({ meta: {}, data: [todo, todo] });
 
       await TodosController.getTodos(req, res, next);
 

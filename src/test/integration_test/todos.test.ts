@@ -57,7 +57,7 @@ describe("Todos Integration Test Suite", () => {
         .post("/todos/")
         .set("Authorization", `Bearer ${accessToken}`)
         .set("Content-Type", "application/json");
-      const id = (todos.body.data.find((todo) => todo.title === "dummyxyz")).id;
+      const id = todos.body.data.find((todo) => todo.title === "dummyxyz").id;
       await request(app)
         .delete(`/todos/delete/?id=${id}`)
         .set("Authorization", `Bearer ${accessToken}`)

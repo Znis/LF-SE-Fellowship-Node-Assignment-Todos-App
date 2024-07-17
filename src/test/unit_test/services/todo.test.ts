@@ -25,18 +25,18 @@ describe("Todos Service Test Suite", () => {
     it("should return todos when the todos are available for the user", async () => {
       todosModelGetTodosStub.resolves([todo, todo]);
       const id = "1";
-      const filter = {size:10, page:1};
+      const filter = { size: 10, page: 1 };
       const mResponse = [todo, todo];
-      const result = await TodosService.getTodos(filter,id);
+      const result = await TodosService.getTodos(filter, id);
 
       expect(result.data).toStrictEqual(mResponse);
     });
     it("should return empty array when the todos are not available for the user", async () => {
       todosModelGetTodosStub.resolves([]);
       const id = "1";
-      const filter = {size:10, page:1};
+      const filter = { size: 10, page: 1 };
       const mResponse = [];
-      const result = await TodosService.getTodos(filter,id);
+      const result = await TodosService.getTodos(filter, id);
 
       expect(result.data).toStrictEqual(mResponse);
     });

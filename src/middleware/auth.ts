@@ -45,20 +45,20 @@ export function auth(req: Request, res: Response, next: NextFunction) {
 
 export function authorize(permission: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    try{
-    const user = req.user!;
-    logger.info("Checking for the permission");
-    const permissions = await AuthService.getAssignedPermission(user.id!);
-    if (!permissions!.includes(permission)) {
-      logger.error("Operation not permitted");
-      next(new ForbiddenError("Forbidden"));
-      return;
+    try {
+      const user = req.user!;
+      logger.info("Checking for the permission");
+      const permissions = await AuthService.getAssignedPermission(user.id!);
+      if (!permissions!.includes(permission)) {
+        logger.error("Operation not permitted");
+        next(new ForbiddenError("Forbidden"));
+        return;
+      }
+      logger.info("Operation permitted");
+      next();
+    } catch {
+      logger.error("Permission Checking failed");
+      next(new ModelError("Permission retrieval error"));
     }
-    logger.info("Operation permitted");
-    next();
-  }catch{
-    logger.error("Permission Checking failed");
-    next(new ModelError("Permission retrieval error"));
-  }
   };
 }

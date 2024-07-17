@@ -24,7 +24,7 @@ const knexConfig: Knex.Config = {
   seeds: {
     directory: "./database/seeds",
     extension: "ts",
-     // stub: "./stubs/seed.stub"
+    // stub: "./stubs/seed.stub"
   },
 };
 

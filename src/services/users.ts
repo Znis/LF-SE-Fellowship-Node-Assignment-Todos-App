@@ -8,7 +8,6 @@ import loggerWithNameSpace from "../utils/logger";
 const logger = loggerWithNameSpace("Users Service");
 const salt = 10;
 export default class UserServices {
-
   static async getUserByEmail(email: string) {
     logger.info(`Getting User with email ${email} from Users Model`);
     const data = await UserModel.getUserByEmail(email);
@@ -39,8 +38,10 @@ export default class UserServices {
     logger.info(`Editing user with id ${id}`);
     const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
-    const { modelResponseCode, queryResult } =
-      await UserModel.editUserById(id, user);
+    const { modelResponseCode, queryResult } = await UserModel.editUserById(
+      id,
+      user
+    );
     if (modelResponseCode != 200) {
       logger.error(`Could not edit user with id ${id}`);
       throw new ModelError("Could not edit User");
@@ -50,8 +51,9 @@ export default class UserServices {
 
   static async deleteUser(id: string) {
     logger.info(`Deleting user with id ${id}`);
-    const { modelResponseCode, queryResult } =
-      await UserModel.deleteUserById(id);
+    const { modelResponseCode, queryResult } = await UserModel.deleteUserById(
+      id
+    );
     if (modelResponseCode != 200) {
       logger.error(`Could not delete user with id ${id}`);
       throw new ModelError("Could not delete User");
@@ -83,9 +85,7 @@ export default class UserServices {
   }
 
   static async getAssignedPermission(userId: string) {
-    logger.info(
-      `Getting assigned permissions for user with userId ${userId}`
-    );
+    logger.info(`Getting assigned permissions for user with userId ${userId}`);
     const roleId = await this.getRoleId(userId);
     if (!roleId!) {
       logger.error(`roleId for user ${userId} not found`);

@@ -1,4 +1,11 @@
-import { checkTodoOwnershipQuery, createTodosQuery, getTodosCountQuery, getTodosQuery, getTodosQueryParams, Itodos } from "../interfaces/todos";
+import {
+  checkTodoOwnershipQuery,
+  createTodosQuery,
+  getTodosCountQuery,
+  getTodosQuery,
+  getTodosQueryParams,
+  Itodos,
+} from "../interfaces/todos";
 import loggerWithNameSpace from "../utils/logger";
 import { BaseModel } from "./base";
 
@@ -11,7 +18,8 @@ export default class TodosModel extends BaseModel {
       const resultData: getTodosCountQuery = await this.queryBuilder()
         .count("*")
         .table("todos")
-        .where("user_id", userId).first();
+        .where("user_id", userId)
+        .first();
 
       logger.info("Query to get Todos completed");
       return resultData;
@@ -23,7 +31,7 @@ export default class TodosModel extends BaseModel {
   static async getTodos(filter: getTodosQueryParams, userId: string) {
     try {
       logger.info("Querying database to get Todos");
-      const resultData: getTodosQuery[]  = await this.queryBuilder()
+      const resultData: getTodosQuery[] = await this.queryBuilder()
         .select("*")
         .from("todos")
         .limit(filter.size)
@@ -136,8 +144,6 @@ export default class TodosModel extends BaseModel {
         .from("todos")
         .where("id", id)
         .andWhere("user_id", userId);
-        
-        
 
       if (!resultData) {
         return {
@@ -167,12 +173,12 @@ export default class TodosModel extends BaseModel {
         .select("user_id")
         .from("todos")
         .where("id", id)
-        .first()
-     
+        .first();
+
       if (!resultData) {
         return false;
       }
-      if (resultData.userId == userId){
+      if (resultData.userId == userId) {
         return true;
       }
       return false;
