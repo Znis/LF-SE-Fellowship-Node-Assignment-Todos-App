@@ -28,8 +28,9 @@ The assignment-6 is tasked with initialising database and creating migration and
 It extend the assignment-7 with improved way of database connection and executing queries, size and pagination for getTodos query, adds types for query result.    
 
   Following are the usage routes for the API: 
-   - Todos  
-POST /todos/ -> fetch all the todos. (query params like size and page can be provided. Default is size as 10 and page as 1)
+   - Todos
+       
+     POST /todos/ -> fetch all the todos. (query params like size and page can be provided. Default is size as 10 and page as 1)
   
      POST /todos/create -> Create the new todo. (requires body as Todo) 
  
@@ -38,7 +39,8 @@ POST /todos/ -> fetch all the todos. (query params like size and page can be pro
      DELETE /todos/delete/ -> Delete the existing todo. (requires id param as Todo id)
  
 
-   - Users (Only for ADMIN role)  
+   - Users (Only for ADMIN role) 
+     
      POST /users/ -> fetch the user with email.  
 
      POST /users/register-> Create the new user. (requires body as User) 
@@ -48,7 +50,8 @@ POST /todos/ -> fetch all the todos. (query params like size and page can be pro
      DELETE /users/delete/ -> Delete the existing user. (requires id param as user id) 
 
 
-   - Auth   
+   - Auth
+       
      POST /auth/login -> Login with email and password and get the tokens. (requires body as login creds) 
   
      POST /auth/refresh-> Create the new access token with refresh token. (requires refresh token in auth headers)
@@ -61,7 +64,7 @@ POST /todos/ -> fetch all the todos. (query params like size and page can be pro
 
 
   The app can be run on docker with docker-compose command. 
-Clone the repo and switch to branch assignment-5 and run the command.    
+Clone the repo and switch to branch assignment-7 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
   Run the following commands.
@@ -112,7 +115,7 @@ npm start
 ```
 OR,  
 
-Clone the repo and switch to branch assignment-5 and run the command.    
+Clone the repo and switch to branch assignment-7 and run the command.    
 Create a .env file and specify the necessary args as given in .env.example.
   
 Run the following commands.
