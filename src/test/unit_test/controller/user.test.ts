@@ -88,7 +88,7 @@ describe("Users Controller Test Suite", () => {
     beforeEach(() => {
       usersServiceEditUserStub = sinon.stub(userServices, "editUser");
       req = {
-        params: { id: "1" },
+        query: { id: "1" },
         body: { ...user },
       };
       res = {
@@ -121,7 +121,7 @@ describe("Users Controller Test Suite", () => {
     beforeEach(() => {
       userServiceDeleteUserStub = sinon.stub(userServices, "deleteUser");
       req = {
-        params: { id: "1" },
+        query: { id: "1" },
         body: { ...user },
       };
       res = {

@@ -1,3 +1,4 @@
+import knex from "knex";
 import { assignRoleQuery, createUserQuery, getAssignedPermissionsForRoleQuery, getRoleIdQuery, getUserByEmailQuery, Iuser } from "../interfaces/user";
 import loggerWithNameSpace from "../utils/logger";
 import { BaseModel } from "./base";
@@ -5,6 +6,7 @@ import { BaseModel } from "./base";
 const logger = loggerWithNameSpace("Users Model");
 
 export default class UserModel extends BaseModel {
+
   static async getUserByEmail(email: string) {
     try {
       logger.info(`Querying database for user with email ${email}`);

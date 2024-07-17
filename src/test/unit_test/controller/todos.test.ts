@@ -88,7 +88,7 @@ describe("Todos Controller Test Suite", () => {
     beforeEach(() => {
       todosServiceUpdateTodosStub = sinon.stub(TodosServices, "updateTodos");
       req = {
-        params: { id: "1" },
+        query: { id: "1" },
         body: { ...todo },
         user: {
           id: "1",
@@ -127,7 +127,7 @@ describe("Todos Controller Test Suite", () => {
     beforeEach(() => {
       todosServiceDeleteTodosStub = sinon.stub(TodosServices, "deleteTodos");
       req = {
-        params: { id: "1" },
+        query: { id: "1" },
         body: { ...todo },
         user: {
           id: "1",

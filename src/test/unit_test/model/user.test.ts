@@ -2,8 +2,6 @@ import expect from "expect";
 import sinon from "sinon";
 import proxyquire from "proxyquire";
 import { Iuser } from "../../../interfaces/user";
-import { BaseModel } from "../../../model/base";
-import UserModel from "../../../model/users";
 
 describe("User Model Test Suite", () => {
   describe("getUserByEmail", () => {
@@ -16,10 +14,9 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        queryBuilder: () => knexStub,
+        "../../utils/db": { knex: () => knexStub },
       }
     );
-    let userModel = UserModel;
 
     afterEach(() => {
       sinon.restore();
@@ -27,18 +24,16 @@ describe("User Model Test Suite", () => {
 
     it("should return null if no user is found", async () => {
       knexStub.where.resolves([]);
-      const result = await userModel.getUserByEmail("nonexistent@example.com");
+      const result = await UserModel.getUserByEmail("nonexistent@example.com");
 
       expect(result).toBeNull;
     });
 
     it("should return the user if found", async () => {
-      const userModel = new UserModel();
-
       const mockUser = { id: 1, email: "test@example.com", name: "Test User" };
       knexStub.where.resolves([mockUser]);
 
-      const result = await userModel.getUserByEmail("test@example.com");
+      const result = await UserModel.getUserByEmail("test@example.com");
 
       expect(result).toStrictEqual(mockUser);
     });
@@ -47,7 +42,7 @@ describe("User Model Test Suite", () => {
       const error = new Error("Database error");
       knexStub.where.rejects(error);
 
-      const result = await userModel.getUserByEmail("error@example.com");
+      const result = await UserModel.getUserByEmail("error@example.com");
 
       expect(result).toBe(null);
     });
@@ -60,10 +55,9 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        queryBuilder: () => knexStub,
+        "../../utils/db": { knex: () => knexStub },
       }
     );
-    let userModel = UserModel;
 
     const user: Iuser = {
       name: "dummy",
@@ -79,7 +73,7 @@ describe("User Model Test Suite", () => {
       knexStub.into.resolves(1);
 
       const mResponse = { modelResponseCode: 200, queryResult: user };
-      const result = await userModel.createUser(user);
+      const result = await UserModel.createUser(user);
       expect(knexStub.insert.calledOnceWithExactly(user)).toBeTruthy;
       expect(result).toStrictEqual(mResponse);
     });
@@ -87,7 +81,7 @@ describe("User Model Test Suite", () => {
     it("should return an error response if insertion fails", async () => {
       knexStub.into.rejects(new Error("Insertion error"));
 
-      const result = await userModel.createUser(user);
+      const result = await UserModel.createUser(user);
 
       expect(result).toStrictEqual({
         modelResponseCode: 400,
@@ -103,10 +97,9 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        queryBuilder: () => knexStub,
+        "../../utils/db": { knex: () => knexStub },
       }
     );
-    let userModel = UserModel;
     afterEach(() => {
       sinon.restore();
     });
@@ -121,7 +114,7 @@ describe("User Model Test Suite", () => {
 
       knexStub.into.resolves(data);
 
-      const result = await userModel.assignRole(userId, role);
+      const result = await UserModel.assignRole(userId, role);
       expect(result).toStrictEqual({
         modelResponseCode: 200,
         queryResult: { role_id: "admin", user_id: "1" },
@@ -134,7 +127,7 @@ describe("User Model Test Suite", () => {
       const userId = "1";
       const role = "admin";
 
-      const result = await userModel.assignRole(userId, role);
+      const result = await UserModel.assignRole(userId, role);
 
       expect(result).toStrictEqual({
         modelResponseCode: 400,
@@ -151,10 +144,9 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        queryBuilder: () => knexStub,
+        "../../utils/db": { knex: () => knexStub },
       }
     );
-    let userModel = UserModel;
 
     afterEach(() => {
       sinon.restore();
@@ -170,7 +162,7 @@ describe("User Model Test Suite", () => {
       const mResponse = { modelResponseCode: 200, queryResult: user };
       knexStub.where.resolves(1);
 
-      const result = await userModel.editUserById(id, user);
+      const result = await UserModel.editUserById(id, user);
 
       expect(knexStub.where.calledOnceWithExactly("id", id));
       expect(
@@ -194,7 +186,7 @@ describe("User Model Test Suite", () => {
 
       knexStub.where.resolves(0);
 
-      const result = await userModel.editUserById(id, user);
+      const result = await UserModel.editUserById(id, user);
 
       expect(knexStub.where.calledOnceWithExactly("id", id));
       expect(
@@ -219,7 +211,7 @@ describe("User Model Test Suite", () => {
 
       knexStub.where.throws(new Error("Database error"));
 
-      const result = await userModel.editUserById(id, user);
+      const result = await UserModel.editUserById(id, user);
 
       expect(knexStub.where.calledOnceWithExactly("id", id));
       expect(
@@ -242,10 +234,10 @@ describe("User Model Test Suite", () => {
     let { default: UserModel } = proxyquire.noCallThru()(
       "../../../model/users",
       {
-        queryBuilder: () => knexStub,
+        "../../utils/db": { knex: () => knexStub },
       }
     );
-    let userModel = UserModel;
+
     afterEach(() => {
       sinon.restore();
     });
@@ -253,7 +245,7 @@ describe("User Model Test Suite", () => {
     it("should return 200 and true when user is deleted successfully", async () => {
       knexStub.where.resolves(1);
 
-      const result = await userModel.deleteUserById("1");
+      const result = await UserModel.deleteUserById("1");
 
       expect(knexStub.where.calledWith("id", "1")).toBeTruthy;
       expect(result).toStrictEqual({
@@ -265,7 +257,7 @@ describe("User Model Test Suite", () => {
     it("should return 400 and false when user deletion fails", async () => {
       knexStub.where.resolves(0);
 
-      const result = await userModel.deleteUserById("1");
+      const result = await UserModel.deleteUserById("1");
 
       expect(knexStub.where.calledWith("id", "1")).toBeTruthy;
       expect(result).toStrictEqual({
@@ -277,7 +269,7 @@ describe("User Model Test Suite", () => {
     it("should return 400 and false when there is an exception", async () => {
       knexStub.where.rejects(new Error("Database Error"));
 
-      const result = await userModel.deleteUserById("1");
+      const result = await UserModel.deleteUserById("1");
 
       expect(knexStub.where.calledWith("id", "1")).toBeTruthy;
       expect(result).toStrictEqual({
@@ -292,36 +284,37 @@ describe("User Model Test Suite", () => {
       from: sinon.stub().returnsThis(),
       where: sinon.stub(),
     };
-    let baseModelQueryBuilderStub;
-
-    baseModelQueryBuilderStub = sinon.stub(UserModel, "connection");
+    let { default: UserModel } = proxyquire.noCallThru()(
+      "../../../model/users",
+      {
+        "../../utils/db": { knex: () => knexStub },
+      }
+    );
     afterEach(() => {
       sinon.restore();
     });
 
-    it.only("should return roleId when userId is found", async () => {
-      const role_id = "1";
-     baseModelQueryBuilderStub.resolves([{ role_id }]);
+    it("should return roleId when userId is found", async () => {
+      const userId = "1";
+      knexStub.where.resolves([{ roleId: userId }]);
 
       const result = await UserModel.getRoleId("1");
 
-      expect(result).toStrictEqual(role_id);
+      expect(result).toStrictEqual(1);
     });
 
     it("should return null when userId is not found", async () => {
-      baseModelQueryBuilderStub.resolves([]);
+      knexStub.where.resolves([]);
 
       const result = await UserModel.getRoleId("1");
-
 
       expect(result).toStrictEqual(null);
     });
 
     it("should return null when there is an exception", async () => {
-      baseModelQueryBuilderStub.rejects(new Error("Database Error"));
+      knexStub.where.rejects(new Error("Database Error"));
 
       const result = await UserModel.getRoleId("1");
-
 
       expect(result).toStrictEqual(null);
     });
@@ -333,9 +326,9 @@ describe("User Model Test Suite", () => {
       where: sinon.stub(),
     };
     let { default: UserModel } = proxyquire.noCallThru()(
-      '../../../model/users',
+      "../../../model/users",
       {
-        '../base': { BaseModel: { queryBuilder: () => knexStub } },
+        "../../utils/db": { knex: () => knexStub },
       }
     );
 

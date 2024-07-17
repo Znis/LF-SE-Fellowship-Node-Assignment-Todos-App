@@ -12,12 +12,11 @@ describe("Todos Model Test Suite", () => {
     };
 
     let { default: TodosModel } = proxyquire.noCallThru()(
-      "../../../model/todos",
+      '../../../model/todos',
       {
-        knex: () => knexStub,
+        '../../utils/db': { knex: () => knexStub  },
       }
     );
-    let todosModel = new TodosModel();
 
     afterEach(() => {
       sinon.restore();
@@ -27,7 +26,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.where.resolves([{ todoId: 1 }, { todoId: 2 }]);
       const userId = "1";
       const mResponse = [{ todoId: 1 }, { todoId: 2 }];
-      const result = await todosModel.getTodos(userId);
+      const result = await TodosModel.getTodos(userId);
 
       expect(result).toStrictEqual(mResponse);
     });
@@ -37,7 +36,7 @@ describe("Todos Model Test Suite", () => {
       const userId = "1";
       const mResponse = [];
 
-      const result = await todosModel.getTodos(userId);
+      const result = await TodosModel.getTodos(userId);
 
       expect(result).toStrictEqual(mResponse);
     });
@@ -46,7 +45,7 @@ describe("Todos Model Test Suite", () => {
       const error = new Error("Database error");
       knexStub.where.rejects(error);
       const userId = "1";
-      const result = await todosModel.getTodos(userId);
+      const result = await TodosModel.getTodos(userId);
 
       expect(result).toBe(null);
     });
@@ -67,12 +66,11 @@ describe("Todos Model Test Suite", () => {
     const userId = "1";
 
     let { default: TodosModel } = proxyquire.noCallThru()(
-      "../../../model/todos",
+      '../../../model/todos',
       {
-        knex: () => knexStub,
+        '../../utils/db': { knex: () => knexStub  },
       }
     );
-    let todosModel = new TodosModel();
     afterEach(() => {
       sinon.restore();
     });
@@ -80,7 +78,7 @@ describe("Todos Model Test Suite", () => {
     it("should insert a new user and return success response", async () => {
       const mResponse = { modelResponseCode: 200, queryResult: todo };
       knexStub.into.resolves(1);
-      const result = await todosModel.createTodos(userId, todo);
+      const result = await TodosModel.createTodos(userId, todo);
       expect(
         knexStub.insert.calledOnceWithExactly({ ...todo, user_id: userId })
       ).toBeTruthy;
@@ -91,7 +89,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.into.rejects(new Error("Insertion error"));
       knexStub.into.resolves(0);
 
-      const result = await todosModel.createTodos(userId, todo);
+      const result = await TodosModel.createTodos(userId, todo);
 
       expect(result).toStrictEqual({
         modelResponseCode: 400,
@@ -118,16 +116,14 @@ describe("Todos Model Test Suite", () => {
     const id = "1";
 
     let { default: TodosModel } = proxyquire.noCallThru()(
-      "../../../model/todos",
+      '../../../model/todos',
       {
-        knex: () => knexStub,
+        '../../utils/db': { knex: () => knexStub  },
       }
     );
     let checkTodoOwnershipStub;
-    let todosModel;
     beforeEach(() => {
-      todosModel = new TodosModel();
-      checkTodoOwnershipStub = sinon.stub(todosModel, "checkTodoOwnership");
+      checkTodoOwnershipStub = sinon.stub(TodosModel, "checkTodoOwnership");
     });
 
     afterEach(() => {
@@ -138,7 +134,7 @@ describe("Todos Model Test Suite", () => {
       checkTodoOwnershipStub.resolves(true);
       knexStub.where.resolves(1);
 
-      const result = await todosModel.updateTodosById(userId, id, todo);
+      const result = await TodosModel.updateTodosById(userId, id, todo);
 
       expect(result).toStrictEqual({
         modelResponseCode: 200,
@@ -149,7 +145,7 @@ describe("Todos Model Test Suite", () => {
     it("should return 403 if todo ownership cannot be verified", async () => {
       checkTodoOwnershipStub.resolves(false);
 
-      const result = await todosModel.updateTodosById(userId, id, todo);
+      const result = await TodosModel.updateTodosById(userId, id, todo);
 
       expect(result).toStrictEqual({
         modelResponseCode: 403,
@@ -161,7 +157,7 @@ describe("Todos Model Test Suite", () => {
       checkTodoOwnershipStub.resolves(true);
       knexStub.where.resolves(0);
 
-      const result = await todosModel.updateTodosById(userId, id, todo);
+      const result = await TodosModel.updateTodosById(userId, id, todo);
 
       expect(knexStub.where.calledWith("id", id)).toBeTruthy;
       expect(
@@ -185,7 +181,7 @@ describe("Todos Model Test Suite", () => {
       checkTodoOwnershipStub.resolves(true);
       knexStub.where.rejects(new Error("Database error"));
 
-      const result = await todosModel.updateTodosById(userId, id, todo);
+      const result = await TodosModel.updateTodosById(userId, id, todo);
 
       expect(knexStub.where.calledWith("id", id)).toBeTruthy;
       expect(
@@ -213,12 +209,11 @@ describe("Todos Model Test Suite", () => {
     };
 
     let { default: TodosModel } = proxyquire.noCallThru()(
-      "../../../model/todos",
+      '../../../model/todos',
       {
-        knex: () => knexStub,
+        '../../utils/db': { knex: () => knexStub  },
       }
     );
-    let todosModel = new TodosModel();
     afterEach(() => {
       sinon.restore();
     });
@@ -227,7 +222,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.where.resolves([{ user_id: 1 }]);
       const userId = "1";
       const id = "1";
-      const result = await todosModel.checkTodoOwnership(userId, id);
+      const result = await TodosModel.checkTodoOwnership(userId, id);
 
       expect(result).toStrictEqual(true);
     });
@@ -237,7 +232,7 @@ describe("Todos Model Test Suite", () => {
       const userId = "1";
       const id = "1";
 
-      const result = await todosModel.checkTodoOwnership(userId, id);
+      const result = await TodosModel.checkTodoOwnership(userId, id);
 
       expect(result).toStrictEqual(false);
     });
@@ -247,7 +242,7 @@ describe("Todos Model Test Suite", () => {
       knexStub.where.rejects(error);
       const userId = "1";
       const id = "1";
-      const result = await todosModel.checkTodoOwnership(userId, id);
+      const result = await TodosModel.checkTodoOwnership(userId, id);
 
       expect(result).toBe(false);
     });

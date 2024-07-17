@@ -37,11 +37,11 @@ static async updateTodos(userId: string, id: string, data: Itodos) {
     data
   );
   if (modelResponseCode == 403) {
-    logger.error(`Todo with ${id} is not authorized for userId ${userId}`);
+    logger.error(`Todo with id ${id} is not authorized for userId ${userId}`);
     throw new ForbiddenError("Forbidden");
   }
   if (modelResponseCode != 200) {
-    logger.error(`Could not update Todo with ${id} for userId ${userId}`);
+    logger.error(`Could not update Todo with id ${id} for userId ${userId}`);
     throw new ModelError("Could not update Todo");
   }
   return queryResult;
@@ -54,11 +54,11 @@ static async deleteTodos(userId: string, id: string) {
     id
   );
   if (modelResponseCode == 403) {
-    logger.error(`Todo with ${id} is not authorized for userId ${userId}`);
+    logger.error(`Todo with id ${id} is not authorized for userId ${userId}`);
     throw new ForbiddenError("Forbidden");
   }
   if (modelResponseCode != 200) {
-    logger.error(`Could not delete Todo with ${id} for userId ${userId}`);
+    logger.error(`Could not delete Todo with id ${id} for userId ${userId}`);
     throw new ModelError("Could not delete Todo");
   }
   return queryResult;

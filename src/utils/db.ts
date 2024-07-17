@@ -4,6 +4,7 @@ import { baseKnexConfig } from "../knexFile";
 import knex, { Knex } from "knex";
 import camelize from "camelize";
 
+
 const knexConfig: Knex.Config = {
     ... baseKnexConfig,
     wrapIdentifier: (value, originalImpl) => {
